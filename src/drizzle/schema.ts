@@ -16,8 +16,8 @@ export const users = pgTable("users", {
     contactPhone: varchar("contact_phone", { length: 20 }),
     address: text("address"),
     role: userRoleEnum("role").default("user"),
-    createdAt: timestamp("created_at", { withTimezone: true }),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Doctors Table
@@ -28,8 +28,8 @@ export const doctors = pgTable("doctors", {
     specialization: varchar("specialization", { length: 255 }),
     contactPhone: varchar("contact_phone", { length: 20 }),
     availableDays: varchar("available_days", { length: 255 }),
-    createdAt: timestamp("created_at", { withTimezone: true }),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Appointments Table
@@ -41,8 +41,8 @@ export const appointments = pgTable("appointments", {
     timeSlot: varchar("time_slot", { length: 50 }),
     totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
     appointmentStatus: appointmentStatusEnum("appointment_status"),
-    createdAt: timestamp("created_at", { withTimezone: true }),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Prescriptions Table
@@ -52,8 +52,8 @@ export const prescriptions = pgTable("prescriptions", {
     doctorId: integer("doctor_id").references(() => doctors.doctorId),
     patientId: integer("patient_id").references(() => users.userId),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true }),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Payments Table
@@ -64,8 +64,8 @@ export const payments = pgTable("payments", {
     paymentStatus: varchar("payment_status", { length: 50 }),
     transactionId: varchar("transaction_id", { length: 255 }),
     paymentDate: date("payment_date"),
-    createdAt: timestamp("created_at", { withTimezone: true }),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Complaints Table
@@ -76,8 +76,8 @@ export const complaints = pgTable("complaints", {
     subject: varchar("subject", { length: 255 }),
     description: text("description"),
     status: complaintStatusEnum("status"),
-    createdAt: timestamp("created_at", { withTimezone: true }),
-    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 
