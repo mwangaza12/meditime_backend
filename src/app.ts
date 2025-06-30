@@ -1,6 +1,8 @@
 import express, { Application,Response } from 'express';
 import dotenv from 'dotenv';
 import cors from "cors"
+import { authRouter } from './auth/auth.route';
+import { logger } from './middleware/logger';
 
 dotenv.config();
 
@@ -10,7 +12,10 @@ const app: Application = express();
 app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(logger);
 
+// Import Routes
+app.use('/api', authRouter);
 
 //default route
 app.get('/', (req, res:Response) => {

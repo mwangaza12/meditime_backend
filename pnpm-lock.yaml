@@ -32,6 +32,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
+      meditime_backend:
+        specifier: 'link:'
+        version: 'link:'
       nodemailer:
         specifier: ^7.0.3
         version: 7.0.4

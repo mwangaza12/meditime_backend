@@ -10,7 +10,7 @@
     "gen": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "studio": "drizzle-kit studio",
-    "push": " drizzle-kit generate && tsx src/drizzle/migrate.ts",
+    "push": " drizzle-kit generate && drizzle-kit migrate",
     "seed": "tsx src/drizzle/seed.ts",
     "test": "jest --config jest.config.ts"
   },
@@ -27,6 +27,7 @@
     "drizzle-orm": "^0.43.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "meditime_backend": "link:",
     "nodemailer": "^7.0.3",
     "pg": "^8.16.0",
     "rate-limiter-flexible": "^7.1.1",
