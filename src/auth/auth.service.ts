@@ -2,7 +2,6 @@ import db from "../drizzle/db";
 import { UserInsert, UserSelect, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
-
 export const registerUserService = async(user: UserInsert): Promise<string> => {
     await db.insert(users).values(user);
 
@@ -42,7 +41,6 @@ export const updateVerificationStatusService = async (email: string, status: boo
     
     return "Verification status updated successfully";
 }
-
 
 export const getUserById = async(id: number):Promise<UserSelect | undefined> => {
     const user = await db.query.users.findFirst({
