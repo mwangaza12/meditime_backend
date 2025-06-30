@@ -4,6 +4,7 @@ import cors from "cors"
 import { authRouter } from './auth/auth.route';
 import { logger } from './middleware/logger';
 import doctorRouter from './doctor/doctor.route';
+import appointmentRouter from './appointment/appointment.route';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(logger);
 // Import Routes
 app.use('/api', authRouter);
 app.use('/api', doctorRouter);
+app.use('/api', appointmentRouter);
 
 //default route
 app.get('/', (req, res:Response) => {
