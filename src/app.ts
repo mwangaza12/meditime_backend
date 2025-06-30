@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from "cors"
 import { authRouter } from './auth/auth.route';
 import { logger } from './middleware/logger';
+import doctorRouter from './doctor/doctor.route';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(logger);
 
 // Import Routes
 app.use('/api', authRouter);
+app.use('/api', doctorRouter);
 
 //default route
 app.get('/', (req, res:Response) => {
