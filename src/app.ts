@@ -5,6 +5,7 @@ import { authRouter } from './auth/auth.route';
 import { logger } from './middleware/logger';
 import doctorRouter from './doctor/doctor.route';
 import appointmentRouter from './appointment/appointment.route';
+import prescriptionRouter from './prescription/prescription.route';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(logger);
 app.use('/api', authRouter);
 app.use('/api', doctorRouter);
 app.use('/api', appointmentRouter);
+app.use('/api', prescriptionRouter);
 
 //default route
 app.get('/', (req, res:Response) => {
