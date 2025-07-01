@@ -8,6 +8,7 @@ import appointmentRouter from './appointment/appointment.route';
 import prescriptionRouter from './prescription/prescription.route';
 import paymentRouter from './payment/payment.route';
 import complaintRouter from './complaint/complaint.route';
+import userRouter from './user/user.route';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api', appointmentRouter);
 app.use('/api', prescriptionRouter);
 app.use('/api', paymentRouter);
 app.use('/api', complaintRouter);
+app.use('/api', userRouter);
 
 //default route
 app.get('/', (req, res:Response) => {
