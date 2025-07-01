@@ -7,13 +7,14 @@ import doctorRouter from './doctor/doctor.route';
 import appointmentRouter from './appointment/appointment.route';
 import prescriptionRouter from './prescription/prescription.route';
 import paymentRouter from './payment/payment.route';
+import complaintRouter from './complaint/complaint.route';
 
 dotenv.config();
 
 const app: Application = express();
 
 // Basic Middleware
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
@@ -24,6 +25,7 @@ app.use('/api', doctorRouter);
 app.use('/api', appointmentRouter);
 app.use('/api', prescriptionRouter);
 app.use('/api', paymentRouter);
+app.use('/api', complaintRouter);
 
 //default route
 app.get('/', (req, res:Response) => {

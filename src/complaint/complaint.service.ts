@@ -1,0 +1,46 @@
+import { eq } from "drizzle-orm";
+import db from "../drizzle/db";
+import { ComplaintInsert, complaints, ComplaintSelect } from "../drizzle/schema";
+
+export const getAllComplaintsService = async (): Promise<ComplaintSelect[] | null> => {
+    const complaints = await db.query.complaints.findMany({
+        with: {
+            user: true,
+            appointment: true,
+        },
+    });
+
+    return complaints;
+}
+
+export const getComplaintByIdService = async (complaintId: number): Promise<ComplaintSelect | undefined> => {
+    const complaint = await db.query.complaints.findFirst({
+        where: eq(complaints.complaintId, complaintId),
+        with: {
+            user: true,
+            appointment: true,
+        },
+    });
+
+    return complaint;
+}
+
+export const createComplaintService = async (complaint: ComplaintInsert): Promise<ComplaintSelect | undefined> => {
+    const [newComplaint] = await db.insert(complaints).values(complaint).returning();
+
+    return newComplaint;
+}
+
+export const updateComplaintService = async (complaintId: number, complaint: ComplaintInsert): Promise<ComplaintSelect | undefined> => {
+    const [updatedComplaint] = await db.update(complaints)
+        .set(complaint)
+        .where(eq(complaints.complaintId, complaintId))
+        .returning();
+
+    return updatedComplaint;
+}
+
+export const deleteComplaintService = async (complaintId: number): Promise<string> => {
+    await db.delete(complaints).where(eq(complaints.complaintId, complaintId));
+    return "Complaint deleted successfully";
+}
