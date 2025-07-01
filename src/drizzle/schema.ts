@@ -6,6 +6,7 @@ import { relations } from "drizzle-orm";
 const userRoleEnum = pgEnum("role", ['user', 'admin', 'doctor']);
 const appointmentStatusEnum = pgEnum("appointmentStatus", ['pending','confirmed','cancelled']);
 const complaintStatusEnum = pgEnum("status", ['open','in_progress','resolved','closed']);
+const paymentStatusEnum = pgEnum("paymentStatus", ['pending', 'completed', 'failed']);
 
 // Users Table
 export const users = pgTable("users", {
@@ -26,8 +27,7 @@ export const users = pgTable("users", {
 // Doctors Table
 export const doctors = pgTable("doctors", {
     doctorId: serial("doctorId").primaryKey(),
-    firstName: varchar("firstName", { length: 255 }),
-    lastName: varchar("lastName", { length: 255 }),
+    userId: integer("userId").references(() => users.userId).unique(),
     specialization: varchar("specialization", { length: 255 }),
     contactPhone: varchar("contactPhone", { length: 20 }),
     availableDays: varchar("availableDays", { length: 255 }),
@@ -64,7 +64,7 @@ export const payments = pgTable("payments", {
     paymentId: serial("paymentId").primaryKey(),
     appointmentId: integer("appointmentId").references(() => appointments.appointmentId),
     amount: decimal("amount", { precision: 10, scale: 2 }),
-    paymentStatus: varchar("paymentStatus", { length: 50 }),
+    paymentStatus: paymentStatusEnum("paymentStatus").default("pending"),
     transactionId: varchar("transactionId", { length: 255 }),
     paymentDate: date("paymentDate"),
     createdAt: timestamp("createdAt").defaultNow(),
@@ -90,7 +90,11 @@ export const userRelations = relations(users, ({ many }) => ({
     prescriptions: many(prescriptions),
 }));
 
-export const doctorRelations = relations(doctors, ({ many }) => ({
+export const doctorRelations = relations(doctors, ({ one, many }) => ({
+    user: one(users, {
+        fields: [doctors.userId],
+        references: [users.userId],
+    }),
     appointments: many(appointments),
     prescriptions: many(prescriptions),
 }));
