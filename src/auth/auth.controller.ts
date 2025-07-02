@@ -37,7 +37,7 @@ export const registerUser = async (req: Request, res: Response) => {
         // Send notification email
         const subject = "Account Created Successfully";
         const html = `
-            <h2>Welcome to our food service, ${user.firstName} ${user.lastName}!</h2>
+            <h2>Welcome to our Medical service, ${user.firstName} ${user.lastName}!</h2>
             <p>Your OTP is: <b>${user.confirmationCode}</b></p>
             <p>Please verify your email to complete the registration process.</p>
         `;
