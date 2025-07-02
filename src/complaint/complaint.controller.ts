@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createComplaintService, deleteComplaintService, getAllComplaintsService, getComplaintByIdService, updateComplaintService } from "./complaint.service";
+import { createComplaintService, deleteComplaintService, getAllComplaintsService, getComplaintByIdService, updateComplaintService,getAllComplaintsByUserService } from "./complaint.service";
 import { complaintValidator } from "../validators/complaint.validator";
 
 export const getAllComplaints = async (req: Request, res: Response) => {
@@ -90,5 +90,25 @@ export const deleteComplaint = async (req: Request, res: Response) => {
         res.status(200).json({ message: "Complaint closed successfully" });
     } catch (error) {
         res.status(500).json({ error: "Failed to close complaint" });
+    }
+}
+
+export const getComplaintByUserId = async (req: Request, res: Response) => {
+    const userId = Number(req.params.userId);
+    console.log("User ID:", userId);
+    if (isNaN(userId)) {
+        res.status(400).json({ error: "Invalid user ID" });
+        return;
+    }
+
+    try {
+        const complaints = await getAllComplaintsByUserService(1, 10, userId);
+        if (!complaints || complaints.length === 0) {
+            res.status(404).json({ error: "No complaints found for this user" });
+            return;
+        }
+        res.status(200).json(complaints);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch complaints for user" });
     }
 }

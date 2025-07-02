@@ -47,3 +47,18 @@ export const deleteComplaintService = async (complaintId: number): Promise<strin
     await db.delete(complaints).where(eq(complaints.complaintId, complaintId));
     return "Complaint deleted successfully";
 }
+
+export const getAllComplaintsByUserService = async (page: number, pageSize: number, userId: number): Promise<ComplaintSelect[] | null> => {
+    const complaintsList = await db.query.complaints.findMany({
+        where: eq(complaints.userId, userId),
+        with: {
+            user: true,
+            appointment: true,
+        },
+        orderBy: desc(complaints.complaintId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+    });
+
+    return complaintsList;
+}
