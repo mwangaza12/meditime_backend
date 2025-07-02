@@ -3,8 +3,11 @@ import { createAppointmentService, deleteAppointmentService, getAllAppointmentsS
 import { appointmentValidator } from "../validators/appointment.validator";
 
 export const getAppointments = async (req: Request, res: Response) => {
+    const page = Number(req.query.page );
+    const pageSize = Number(req.query.pageSize );
+    
     try {
-        const appointments = await getAllAppointmentsService();
+        const appointments = await getAllAppointmentsService(page, pageSize);
         if (!appointments || appointments.length === 0) {
             res.status(404).json({ error: "No appointments found" });
             return;

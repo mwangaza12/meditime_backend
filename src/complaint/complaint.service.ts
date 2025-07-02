@@ -1,16 +1,19 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
 import { ComplaintInsert, complaints, ComplaintSelect } from "../drizzle/schema";
 
-export const getAllComplaintsService = async (): Promise<ComplaintSelect[] | null> => {
-    const complaints = await db.query.complaints.findMany({
+export const getAllComplaintsService = async (page:number, pageSize: number): Promise<ComplaintSelect[] | null> => {
+    const complaintsList = await db.query.complaints.findMany({
         with: {
             user: true,
             appointment: true,
         },
+        orderBy: desc(complaints.complaintId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
     });
 
-    return complaints;
+    return complaintsList;
 }
 
 export const getComplaintByIdService = async (complaintId: number): Promise<ComplaintSelect | undefined> => {

@@ -3,8 +3,10 @@ import { createComplaintService, deleteComplaintService, getAllComplaintsService
 import { complaintValidator } from "../validators/complaint.validator";
 
 export const getAllComplaints = async (req: Request, res: Response) => {
+    const page = Number(req.query.page);
+    const pageSize = Number(req.query.pageSize);
     try {
-        const complaints = await getAllComplaintsService();
+        const complaints = await getAllComplaintsService(page, pageSize);
         if (!complaints || complaints.length === 0) {
             res.status(404).json({ error: "No complaints found" });
             return;

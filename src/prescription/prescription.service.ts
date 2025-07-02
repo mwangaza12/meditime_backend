@@ -1,18 +1,21 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
 import { PrescriptionInsert, prescriptions, PrescriptionSelect } from "../drizzle/schema"
 
 
-export const getPrescriptionService = async(): Promise<PrescriptionSelect[] | null> => {
-    const prescriptions = await db.query.prescriptions.findMany({
+export const getPrescriptionService = async(page: number, pageSize: number): Promise<PrescriptionSelect[] | null> => {
+    const prescriptionsList = await db.query.prescriptions.findMany({
         with: {
             doctor: true,
             patient: true,
             appointment: true,
         },
+        orderBy: desc(prescriptions.prescriptionId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
     });
 
-    return prescriptions;
+    return prescriptionsList;
 }
 
 export const getPrescriptionByIdService = async (prescriptionId: number): Promise<PrescriptionSelect | undefined> => {

@@ -1,16 +1,19 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
 import { PaymentInsert, payments, PaymentSelect } from "../drizzle/schema";
 
 
-export const getAllPaymentsService = async(): Promise<PaymentSelect[] | null> => {
-    const payments = await db.query.payments.findMany({
+export const getAllPaymentsService = async(page:number, pageSize: number): Promise<PaymentSelect[] | null> => {
+    const paymentList = await db.query.payments.findMany({
         with: {
             appointment: true,
         },
+        orderBy: desc(payments.paymentId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
     });
 
-    return payments;
+    return paymentList;
 }
 
 export const getPaymentByIdService = async (paymentId: number): Promise<PaymentSelect | undefined> => {

@@ -1,7 +1,21 @@
-import { eq } from "drizzle-orm";
-import { users, UserSelect } from "../drizzle/schema";
+import { desc, eq } from "drizzle-orm";
+import { UserInsert, users, UserSelect } from "../drizzle/schema";
 import db from "../drizzle/db";
 
+
+export const getAllUsersService = async (page: number, pageSize: number): Promise<UserSelect[] | null> => {
+    const usersList = await db.query.users.findMany({
+        with: {
+            appointments: true,
+            complaints: true,
+        },
+        orderBy: desc(users.userId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+    });
+
+    return usersList;
+}
 
 export const getUserByIdService = async (userId: number): Promise<UserSelect | undefined> => {
     const user = await db.query.users.findFirst({
@@ -15,13 +29,16 @@ export const getUserByIdService = async (userId: number): Promise<UserSelect | u
     return user;
 }
 
-export const getAllUsersService = async (): Promise<UserSelect[] | null> => {
-    const usersList = await db.query.users.findMany({
-        with: {
-            appointments: true,
-            complaints: true,
-        },
-    });
+export const updateUserByIdService = async (userId: number, userData: UserInsert): Promise<UserSelect | undefined> => {
+    const updatedUser = await db.update(users)
+        .set(userData)
+        .where(eq(users.userId, userId))
+        .returning();
 
-    return usersList;
+    return updatedUser[0];
+}
+
+export const deleteUserByIdService = async (userId: number): Promise<string> => {
+    await db.delete(users).where(eq(users.userId, userId));
+    return `User with ID ${userId} deleted successfully`;
 }

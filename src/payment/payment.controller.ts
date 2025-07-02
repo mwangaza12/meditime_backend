@@ -2,8 +2,11 @@ import { Request, Response } from "express";
 import { createPaymentService, deletePaymentService, getAllPaymentsService, getPaymentByIdService, updatePaymentService } from "./payment.service";
 
 export const getAllPayments = async (req: Request, res: Response) => {
+    const page = Number(req.body.page);
+    const pageSize = Number(req.query.pageSize);
+    
     try {
-        const payments = await getAllPaymentsService();
+        const payments = await getAllPaymentsService(page, pageSize);
         if (!payments || payments.length === 0) {
             res.status(404).json({ error: "No payments found" });
             return;

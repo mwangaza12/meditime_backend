@@ -3,8 +3,11 @@ import { createPrescriptionService, deletePrescriptionService, getPrescriptionBy
 import { prescriptionValidator } from "../validators/prescription.validator";
 
 export const getPrescriptions = async (req: Request, res: Response) => {
+    const page = Number(req.query.page);
+    const pageSize = Number(req.query.pageSize);
+
     try {
-        const prescriptions = await getPrescriptionService();
+        const prescriptions = await getPrescriptionService(page, pageSize);
         if (!prescriptions || prescriptions.length === 0) {
             res.status(404).json({ error: "No prescriptions found" });
             return;

@@ -1,9 +1,9 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
 import { AppointmentInsert, appointments, AppointmentSelect } from "../drizzle/schema";
 
-export const getAllAppointmentsService = async (): Promise<AppointmentSelect[] | null> => {
-    const appointments = await db.query.appointments.findMany({
+export const getAllAppointmentsService = async (page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
+    const appointmentsList = await db.query.appointments.findMany({
         with: {
             user: true,
             doctor: true,
@@ -11,9 +11,10 @@ export const getAllAppointmentsService = async (): Promise<AppointmentSelect[] |
             payments: true,
             complaints: true,
         },
+        orderBy: desc(appointments.appointmentId),
     });
 
-    return appointments;
+    return appointmentsList;
 }
 
 export const getAppointmentByIdService = async (appointmentId: number): Promise<AppointmentSelect | undefined> => {

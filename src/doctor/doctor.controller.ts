@@ -3,8 +3,11 @@ import { createDoctorService, deleteDoctorService, getDoctorByIdService, getDoct
 import { createDoctorValidator } from "../validators/doctor.validator";
 
 export const getDoctors = async(req: Request, res: Response) => {
+    const page = Number(req.query.page);
+    const pageSize = Number(req.query.pageSize);
+
     try {
-        const doctors = await getDoctorsService();
+        const doctors = await getDoctorsService(page, pageSize);
         if (!doctors || doctors.length === 0) {
             res.status(404).json({ error: "No doctors found" });
             return;
