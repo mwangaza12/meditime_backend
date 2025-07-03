@@ -33,15 +33,6 @@ export const createPaymentService = async (payment: PaymentInsert): Promise<Paym
     return newPayment;
 }
 
-export const updatePaymentService = async (paymentId: number, payment: PaymentInsert): Promise<PaymentSelect | undefined> => {
-    const [updatedPayment] = await db.update(payments)
-        .set(payment)
-        .where(eq(payments.paymentId, paymentId))
-        .returning();
-
-    return updatedPayment;
-}
-
 export const deletePaymentService = async (paymentId: number): Promise<string> => {
     await db.delete(payments).where(eq(payments.paymentId, paymentId));
     return "Payment deleted successfully";

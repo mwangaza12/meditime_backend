@@ -46,26 +46,6 @@ export const createPayment = async (req: Request, res: Response) => {
     }
 }
 
-export const updatePayment = async (req: Request, res: Response) => {
-    const paymentId = parseInt(req.params.id);
-    if (isNaN(paymentId)) {
-        res.status(400).json({ error: "Invalid payment ID" });
-        return;
-    }
-
-    const paymentData = req.body; // Assuming validation is done elsewhere
-    try {
-        const updatedPayment = await updatePaymentService(paymentId,paymentData);
-        if (!updatedPayment) {
-            res.status(404).json({ error: "Payment not found" });
-            return;
-        }
-        res.status(200).json(updatedPayment);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update payment" });
-    }
-}
-
 export const deletePayment = async (req: Request, res: Response) => {
     const paymentId = parseInt(req.params.id);
     if (isNaN(paymentId)) {
