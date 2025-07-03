@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createPaymentService, deletePaymentService, getAllPaymentsService, getPaymentByIdService, updatePaymentService } from "./payment.service";
+import { createPaymentService, deletePaymentService, getAllPaymentsService, getPaymentByIdService } from "./payment.service";
 
 export const getAllPayments = async (req: Request, res: Response) => {
     const page = Number(req.body.page);
