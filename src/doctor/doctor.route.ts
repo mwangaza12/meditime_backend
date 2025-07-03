@@ -5,7 +5,7 @@ import { adminAuth } from "../middleware/bearAuth";
 
 const doctorRouter = Router();
 
-doctorRouter.get("/doctors",pagination,adminAuth, getDoctors);
+doctorRouter.get("/doctors",pagination, getDoctors);
 doctorRouter.get("/doctors/:id",adminAuth, getDoctorById);
 doctorRouter.post("/doctors",adminAuth, createDoctor);
 doctorRouter.put("/doctors/:id",adminAuth, updateDoctor);

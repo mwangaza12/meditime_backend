@@ -3,8 +3,13 @@ import { createDoctorService, deleteDoctorService, getDoctorByIdService, getDoct
 import { createDoctorValidator } from "../validators/doctor.validator";
 
 export const getDoctors = async(req: Request, res: Response) => {
-    const page = Number(req.query.page);
-    const pageSize = Number(req.query.pageSize);
+    const page = Number(req.query.page) || 1; // Default to page 1 if not provided
+    const pageSize = Number(req.query.pageSize) || 10; // Default to page size of 10 if not provide
+
+     if (page <= 0 || pageSize <= 0) {
+        res.status(400).json({ error: "Invalid page or pageSize" });
+        return;
+    }
 
     try {
         const doctors = await getDoctorsService(page, pageSize);
@@ -23,7 +28,7 @@ export const getDoctorById = async(req: Request, res: Response) => {
     const doctorId = parseInt(req.params.id);
     if (isNaN(doctorId)) {
         res.status(400).json({ error: "Invalid doctor ID" });
-        return
+        return;
     }
 
     try {
@@ -34,11 +39,10 @@ export const getDoctorById = async(req: Request, res: Response) => {
         }
         res.status(200).json(doctor);
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch doctor" });
-        return;
+        console.error("Error fetching doctor:", error);
+        res.status(500).json({ error: "Failed to fetch doctor", details: error instanceof Error ? error.message : String(error) });
     }
 }
-
 
 export const createDoctor = async(req: Request, res: Response) => {
     const doctor = createDoctorValidator.safeParse(req.body);
@@ -99,4 +103,3 @@ export const deleteDoctor = async(req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to delete doctor" });
     }
 }
-

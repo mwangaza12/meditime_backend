@@ -9,6 +9,7 @@ import prescriptionRouter from './prescription/prescription.route';
 import paymentRouter from './payment/payment.route';
 import complaintRouter from './complaint/complaint.route';
 import userRouter from './user/user.route';
+import { setupSwagger } from './swagger';
 
 dotenv.config();
 
@@ -34,6 +35,8 @@ app.get('/', (req, res:Response) => {
   res.send("Welcome to MediTime Express API Backend With Drizzle ORM and PostgreSQL");
 });
 
+// Swagger setup
+setupSwagger(app);
 
 const PORT = process.env.PORT || 5000;
 
@@ -43,4 +46,3 @@ app.use((req, res) => {
 });
 
 export default app;
-  

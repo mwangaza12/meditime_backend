@@ -35,19 +35,19 @@ export const registerUser = async (req: Request, res: Response) => {
         const newUser = await registerUserService(user);
 
         // Send notification email
-        const subject = "Account Created Successfully";
-        const html = `
-            <h2>Welcome to our Medical service, ${user.firstName} ${user.lastName}!</h2>
-            <p>Your OTP is: <b>${user.confirmationCode}</b></p>
-            <p>Please verify your email to complete the registration process.</p>
-        `;
+        // const subject = "Account Created Successfully";
+        // const html = `
+        //     <h2>Welcome to our Medical service, ${user.firstName} ${user.lastName}!</h2>
+        //     <p>Your OTP is: <b>${user.confirmationCode}</b></p>
+        //     <p>Please verify your email to complete the registration process.</p>
+        // `;
 
-        const emailSent = await sendNotificationEmail(user.email, user.firstName, subject, html);
+        // const emailSent = await sendNotificationEmail(user.email, user.firstName, subject, html);
 
-        if (!emailSent) {
-            res.status(500).json({ error: "User created but failed to send notification email" });
-            return;
-        }
+        // if (!emailSent) {
+        //     res.status(500).json({ error: "User created but failed to send notification email" });
+        //     return;
+        // }
 
         res.status(201).json({ email: "Email sent successfully", user: newUser });
 

@@ -3,10 +3,10 @@ import {pgTable,serial,varchar,text,decimal,integer,date,timestamp,pgEnum,boolea
 import { relations } from "drizzle-orm";
 
 // Define all enums first - this ensures they're created before tables that reference them
-const userRoleEnum = pgEnum("role", ['user', 'admin', 'doctor']);
-const appointmentStatusEnum = pgEnum("appointmentStatus", ['pending','confirmed','cancelled']);
-const complaintStatusEnum = pgEnum("status", ['open','in_progress','resolved','closed']);
-const paymentStatusEnum = pgEnum("paymentStatus", ['pending', 'completed', 'failed']);
+export const userRoleEnum = pgEnum("role", ['user', 'admin', 'doctor']);
+export const appointmentStatusEnum = pgEnum("appointmentStatus", ['pending','confirmed','cancelled']);
+export const complaintStatusEnum = pgEnum("status", ['open','in_progress','resolved','closed']);
+export const paymentStatusEnum = pgEnum("paymentStatus", ['pending', 'completed', 'failed']);
 
 // Users Table
 export const users = pgTable("users", {

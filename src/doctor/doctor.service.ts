@@ -9,7 +9,7 @@ export const getDoctorsService = async (page: number, pageSize: number): Promise
             prescriptions: true,
         },
         orderBy: desc(doctors.doctorId),
-        offset: (page - 1) * pageSize,
+        offset: pageSize * (page - 1), // Calculate offset based on page and pageSize
         limit: pageSize,
     });
 
