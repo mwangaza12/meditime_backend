@@ -5,7 +5,7 @@ import { adminAuth } from "../middleware/bearAuth";
 
 const userRouter = Router();
 
-userRouter.get("/users", pagination,adminAuth, getAllUsers);
+userRouter.get("/users", pagination, getAllUsers);
 userRouter.get("/users/:id", getUserById);
 userRouter.patch("/users/:id", updateUserById);
 userRouter.delete("/users/:id", deleteUserById);

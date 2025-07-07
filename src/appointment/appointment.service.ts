@@ -5,8 +5,26 @@ import { AppointmentInsert, appointments, AppointmentSelect } from "../drizzle/s
 export const getAllAppointmentsService = async (page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
     const appointmentsList = await db.query.appointments.findMany({
         with: {
-            user: true,
-            doctor: true,
+            user: {
+                columns: {
+                    firstName: true,
+                    lastName: true,
+                }
+            },
+            doctor: {
+                columns: {
+                    specialization: true
+                },
+                with: {
+                    user: {
+                        columns: {
+                            firstName: true,
+                            lastName: true,
+                            
+                        }
+                    },
+                }
+            },
             prescriptions: true,
             payments: true,
             complaints: true,
@@ -21,8 +39,26 @@ export const getAppointmentByIdService = async (appointmentId: number): Promise<
     const appointment = await db.query.appointments.findFirst({
         where: eq(appointments.appointmentId, appointmentId),
         with: {
-            user: true,
-            doctor: true,
+            user: {
+                columns: {
+                    firstName: true,
+                    lastName: true,
+                }
+            },
+            doctor: {
+                columns: {
+                    specialization: true
+                },
+                with: {
+                    user: {
+                        columns: {
+                            firstName: true,
+                            lastName: true,
+                            
+                        }
+                    },
+                }
+            },
             prescriptions: true,
             payments: true,
             complaints: true,

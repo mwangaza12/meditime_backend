@@ -5,7 +5,7 @@ import { adminAuth } from "../middleware/bearAuth";
 
 const appointmentRouter = Router();
 
-appointmentRouter.get("/appointments", pagination, adminAuth, getAppointments);
+appointmentRouter.get("/appointments", pagination, getAppointments);
 appointmentRouter.get("/appointments/:id", getAppointmentById);
 appointmentRouter.post("/appointments", createAppointment);
 appointmentRouter.put("/appointments/:id", updateAppointment);

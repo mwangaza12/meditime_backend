@@ -6,7 +6,33 @@ import { PaymentInsert, payments, PaymentSelect } from "../drizzle/schema";
 export const getAllPaymentsService = async(page:number, pageSize: number): Promise<PaymentSelect[] | null> => {
     const paymentList = await db.query.payments.findMany({
         with: {
-            appointment: true,
+            appointment: {
+                columns: {
+                    appointmentStatus: true,
+                    appointmentDate: true,
+                },
+                with: {
+                    user: {
+                        columns:{
+                            firstName: true,
+                            lastName: true
+                        }
+                    },
+                    doctor:{
+                        columns: {
+                            specialization: true
+                        },
+                        with: {
+                            user: {
+                                columns: {
+                                    firstName: true,
+                                    lastName: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
         },
         orderBy: desc(payments.paymentId),
         offset: (page - 1) * pageSize,
@@ -20,7 +46,33 @@ export const getPaymentByIdService = async (paymentId: number): Promise<PaymentS
     const payment = await db.query.payments.findFirst({
         where: eq(payments.paymentId, paymentId),
         with: {
-            appointment: true,
+            appointment: {
+                columns: {
+                    appointmentStatus: true,
+                    appointmentDate: true,
+                },
+                with: {
+                    user: {
+                        columns:{
+                            firstName: true,
+                            lastName: true
+                        }
+                    },
+                    doctor:{
+                        columns: {
+                            specialization: true
+                        },
+                        with: {
+                            user: {
+                                columns: {
+                                    firstName: true,
+                                    lastName: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
         },
     });
 

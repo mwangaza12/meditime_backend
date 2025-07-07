@@ -35,19 +35,27 @@ export const registerUser = async (req: Request, res: Response) => {
         const newUser = await registerUserService(user);
 
         // Send notification email
-        // const subject = "Account Created Successfully";
-        // const html = `
-        //     <h2>Welcome to our Medical service, ${user.firstName} ${user.lastName}!</h2>
-        //     <p>Your OTP is: <b>${user.confirmationCode}</b></p>
-        //     <p>Please verify your email to complete the registration process.</p>
-        // `;
+        const subject = "Account Created Successfully";
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; background-color: #f9f9f9; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #093FB4;">Welcome, ${user.firstName} ${user.lastName}!</h2>
+                <p>Thank you for registering with our <strong>Medical Appointment & Patient Management System</strong>.</p>
+                <p>Your verification code is:</p>
+                <div style="background-color: #eef3fc; padding: 10px; border-radius: 6px; text-align: center; font-size: 20px; font-weight: bold; color: #093FB4;">
+                ${user.confirmationCode}
+                </div>
+                <p>Please enter this code to verify your email and activate your account.</p>
+                <p style="color: #777;">If you did not create this account, please ignore this email.</p>
+                <p style="margin-top: 30px;">Thank you,<br><strong>The Medical Services Team</strong></p>
+            </div>
+        `;
 
-        // const emailSent = await sendNotificationEmail(user.email, user.firstName, subject, html);
+        const emailSent = await sendNotificationEmail(user.email, user.firstName, subject, html);
 
-        // if (!emailSent) {
-        //     res.status(500).json({ error: "User created but failed to send notification email" });
-        //     return;
-        // }
+        if (!emailSent) {
+            res.status(500).json({ error: "User created but failed to send notification email" });
+            return;
+        }
 
         res.status(201).json({ email: "Email sent successfully", user: newUser, message: "User registered successfully. Please verify your email." });
 
@@ -56,54 +64,56 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 }
 
-export const loginUser = async(req: Request, res:Response) => {
-    try{
+export const loginUser = async (req: Request, res: Response) => {
+    try {
+        const parseResult = userLogInValidator.safeParse(req.body);
 
-        const parseResult= userLogInValidator.safeParse(req.body)
-
-        if(!parseResult.success){
-            res.status(404).json({error: parseResult.error})
-            return;
+        if (!parseResult.success) {
+        res.status(400).json({ error: "Invalid input", details: parseResult.error });
+        return;
         }
-        const user =parseResult.data;
 
-        //if user exists
+        const user = parseResult.data;
+
         const userExists = await getUserByEmailService(user.email);
-        if(!userExists){
-            res.status(404).json({error: " User does not exist"})
-            return;
+        if (!userExists) {
+        res.status(404).json({ error: "User does not exist" });
+        return;
         }
 
-        //if email is verified
-        if (userExists.emailVerified === false){
-            res.status(404).json({error: "Please Verify Email"})
-            return;
+        if (!userExists.emailVerified) {
+        res.status(403).json({ error: "Please Verify Email" });
+        return;
         }
 
-
-        //to check is passwords match
-        const isMatch = bcrypt.compareSync(user.password,userExists.password!);
-        if(!isMatch){
-            res.status(404).json({error:"Invalid password"})
+        const isMatch = bcrypt.compareSync(user.password, userExists.password!);
+        if (!isMatch) {
+        res.status(401).json({ error: "Invalid password" });
+        return; // Missing return fixed
         }
 
-        //generate a token
-        const payload= {
-            userId:userExists.userId,
-            userEmail:userExists.email,
-            role:userExists.role,
-            //expiry 
-            exp: Math.floor(Date.now() / 1000) + (60 * 60)
-        }
+        const payload = {
+        userId: userExists.userId,
+        userEmail: userExists.email,
+        role: userExists.role,
+        exp: Math.floor(Date.now() / 1000) + 60 * 60,
+        };
 
-        let secret = process.env.JWT_SECRET as string;
+        const secret = process.env.JWT_SECRET as string;
         const token = jwt.sign(payload, secret);
 
-        res.status(200).json({ token, userId: userExists.userId, email: userExists.email, role: userExists.role, message: "Login successful 😎" });
-    } catch (error:any) {
-        res.status(500).json({ error:error.message || "Failed to login user" });
+        res.status(200).json({
+        token,
+        userId: userExists.userId,
+        email: userExists.email,
+        role: userExists.role,
+        message: "Login successful 😎",
+        });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message || "Failed to login user" });
     }
-}
+};
+
 
 export const passwordReset = async (req: Request, res: Response) => {
     try {
