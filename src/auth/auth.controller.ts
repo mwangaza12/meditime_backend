@@ -49,7 +49,7 @@ export const registerUser = async (req: Request, res: Response) => {
         //     return;
         // }
 
-        res.status(201).json({ email: "Email sent successfully", user: newUser });
+        res.status(201).json({ email: "Email sent successfully", user: newUser, message: "User registered successfully. Please verify your email." });
 
     } catch (error: any) {
         res.status(500).json({ error: error.message || "Failed to register user" });
@@ -99,7 +99,7 @@ export const loginUser = async(req: Request, res:Response) => {
         let secret = process.env.JWT_SECRET as string;
         const token = jwt.sign(payload, secret);
 
-        res.status(200).json({ token, userId: userExists.userId, email: userExists.email, role: userExists.role });
+        res.status(200).json({ token, userId: userExists.userId, email: userExists.email, role: userExists.role, message: "Login successful 😎" });
     } catch (error:any) {
         res.status(500).json({ error:error.message || "Failed to login user" });
     }
