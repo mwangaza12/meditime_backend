@@ -45,11 +45,7 @@ export const sendNotificationEmail = async (email: string, subject: string, firs
             </style>
             </head>
             <body>
-                <div class="email-container">
-                    <h2>${subject}</h2>
-                    <p>Hey ${firstName}</p>
                     <p>${message}</p>
-                    <p>Thank you for using our service!</p>
                 </div>
             <body>`
         }

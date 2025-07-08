@@ -50,7 +50,7 @@ export const registerUser = async (req: Request, res: Response) => {
             </div>
         `;
 
-        const emailSent = await sendNotificationEmail(user.email, user.firstName, subject, html);
+        const emailSent = await sendNotificationEmail(user.email,subject, user.firstName, html);
 
         if (!emailSent) {
             res.status(500).json({ error: "User created but failed to send notification email" });

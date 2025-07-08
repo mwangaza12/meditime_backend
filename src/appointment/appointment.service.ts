@@ -87,3 +87,40 @@ export const deleteAppointmentService = async (appointmentId: number): Promise<s
     await db.delete(appointments).where(eq(appointments.appointmentId, appointmentId));
     return "Appointment deleted successfully";
 }
+
+export const getAppointmentsByUserIdService = async (userId: number,page: number, pageSize: number):  Promise<AppointmentSelect[] | null> => {
+    const appointmentsList = await db.query.appointments.findMany({
+        where: eq(appointments.userId, userId),
+        with: {
+            user: {
+                columns: {
+                    firstName: true,
+                    lastName: true,
+                }
+            },
+            doctor: {
+                columns: {
+                    specialization: true
+                },
+                with: {
+                    user: {
+                        columns: {
+                            firstName: true,
+                            lastName: true,
+                            
+                        }
+                    },
+                }
+            },
+            prescriptions: true,
+            payments: true,
+            complaints: true,
+        },
+        orderBy: desc(appointments.appointmentId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+
+    })
+
+    return appointmentsList;
+}

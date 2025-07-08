@@ -1,5 +1,5 @@
-import { desc, eq } from "drizzle-orm";
-import { UserInsert, users, UserSelect } from "../drizzle/schema";
+import { desc, eq, sql } from "drizzle-orm";
+import { UserInsert, UserRole, users, UserSelect } from "../drizzle/schema";
 import db from "../drizzle/db";
 
 export type UserListItem = {
@@ -12,13 +12,15 @@ export type UserListItem = {
 };
 
 
-export const getAllUsersService = async (page: number,pageSize: number): Promise<UserListItem[] | null> => {
+export const getAllUsersService = async (page: number, pageSize: number) => {
+  // Get total count using raw SQL
+    const [{ count }] = await db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(users);
+
     const usersList = await db.query.users.findMany({
         columns: {
-            firstName: true,
-            lastName: true,
-            contactPhone: true,
-            address: true,
+            password: false
         },
         with: {
             appointments: true,
@@ -29,8 +31,9 @@ export const getAllUsersService = async (page: number,pageSize: number): Promise
         limit: pageSize,
     });
 
-    return usersList;
+    return { users: usersList, total: Number(count) };
 };
+
 
 
 export const getUserByIdService = async (userId: number): Promise<UserListItem | undefined> => {
@@ -65,3 +68,14 @@ export const deleteUserByIdService = async (userId: number): Promise<string> => 
     await db.delete(users).where(eq(users.userId, userId));
     return `User with ID ${userId} deleted successfully`;
 }
+
+
+export const updateUserRoleService = async (id: number, role: UserRole): Promise<UserSelect> => {
+  const [updatedUser] = await db
+    .update(users)
+    .set({ role })
+    .where(eq(users.userId, id))
+    .returning();
+
+  return updatedUser;
+};

@@ -8,6 +8,9 @@ export const appointmentStatusEnum = pgEnum("appointmentStatus", ['pending','con
 export const complaintStatusEnum = pgEnum("status", ['open','in_progress','resolved','closed']);
 export const paymentStatusEnum = pgEnum("paymentStatus", ['pending', 'completed', 'failed']);
 
+
+export type UserRole = typeof userRoleEnum.enumValues[number];
+
 // Users Table
 export const users = pgTable("users", {
     userId: serial("user_id").primaryKey(),

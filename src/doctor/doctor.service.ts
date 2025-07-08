@@ -7,6 +7,11 @@ export const getDoctorsService = async (page: number, pageSize: number): Promise
         with: {
             appointments: true,
             prescriptions: true,
+            user: {
+                columns:{
+                    password: false
+                }
+            }
         },
         orderBy: desc(doctors.doctorId),
         offset: pageSize * (page - 1), // Calculate offset based on page and pageSize

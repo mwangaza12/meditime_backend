@@ -1,22 +1,23 @@
 import e, { Request, Response } from "express";
-import { deleteUserByIdService, getAllUsersService, getUserByIdService, updateUserByIdService,  } from "./user.service";   
+import { deleteUserByIdService, getAllUsersService, getUserByIdService, updateUserByIdService, updateUserRoleService } from "./user.service";   
 import { registerUserValidator } from "../validators/user.validator";
 
 export const getAllUsers = async (req: Request, res: Response) => {
-    const page = Number(req.query.page);
-    const pageSize = Number(req.query.pageSize);
+  const page = Number(req.query.page);
+  const pageSize = Number(req.query.pageSize);
 
-    try {
-        const users = await getAllUsersService(page, pageSize);
-        if (!users || users.length === 0) {
-            res.status(404).json({ error: "No users found" });
-            return;
-        }
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch users" });
+  try {
+    const { users, total } = await getAllUsersService(page, pageSize);
+    if (!users || users.length === 0) {
+      res.status(404).json({ error: "No users found" });
+      return;
     }
-}
+    res.status(200).json({ users, total });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+};
+
 
 export const getUserById = async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id);
@@ -80,3 +81,30 @@ export const deleteUserById = async (req: Request, res: Response) => {
     }
 }
 
+
+export const updateUserRoleOnly = async (req: Request, res: Response) => {
+  const userId = parseInt(req.params.id);
+
+  console.log(userId);
+  if (isNaN(userId)) {
+    res.status(400).json({ message: "Invalid user ID" });
+    return 
+  }
+
+  const { role } = req.body;
+
+  const allowedUserTypes = ["admin", "user", "doctor"] as const;
+
+  if (!allowedUserTypes.includes(role)) {
+    res.status(400).json({ message: "Invalid user type" });
+    return 
+  }
+
+  try {
+    const updatedUser = await updateUserRoleService(userId, role as typeof allowedUserTypes[number]);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user type:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

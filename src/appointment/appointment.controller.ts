@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService } from "./appointment.service";
+import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService } from "./appointment.service";
 import { appointmentValidator } from "../validators/appointment.validator";
 
 export const getAppointments = async (req: Request, res: Response) => {
@@ -100,3 +100,31 @@ export const deleteAppointment = async (req: Request, res: Response) => {
         return;
     }
 }
+
+export const getAppointmentsByUserId = async (req: Request, res: Response) => {
+    try {
+        const userId = Number(req.query.userId);  // Using query param: /appointments/user?userId=123
+        console.log(userId);
+
+        if (isNaN(userId)) {
+             res.status(400).json({ message: "Invalid or missing userId" });
+             return;
+        }
+        const page=1;
+        const pageSize = 10;
+
+        const appointments = await getAppointmentsByUserIdService(userId, page, pageSize);
+
+        if (!appointments) {
+             res.status(404).json({ message: "No appointments found for this user." });
+             return;
+        }
+
+         res.status(200).json(appointments);
+         return;
+    } catch (error) {
+        console.error("Failed to get appointments:", error);
+         res.status(500).json({ message: "Internal server error" });
+         return;
+    }
+};
