@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
-import { AppointmentInsert, appointments, AppointmentSelect } from "../drizzle/schema";
+import { AppointmentInsert, appointments, AppointmentSelect, doctors } from "../drizzle/schema";
 
 export const getAllAppointmentsService = async (page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
     const appointmentsList = await db.query.appointments.findMany({
@@ -124,3 +124,52 @@ export const getAppointmentsByUserIdService = async (userId: number,page: number
 
     return appointmentsList;
 }
+
+export const getAppointmentsByDoctorIdService = async (userId: number, page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
+  // Find the doctor record linked to this userId
+  const doctorRecord = await db.query.doctors.findFirst({
+    where: eq(doctors.userId, userId),
+    columns: { doctorId: true }
+  });
+
+  if (!doctorRecord) {
+    // No doctor linked to this userId
+    return null;
+  }
+
+  const doctorId = doctorRecord.doctorId;
+
+  // Now find appointments for this doctorId
+  const appointmentsList = await db.query.appointments.findMany({
+    where: eq(appointments.doctorId, doctorId),
+    with: {
+      user: {
+        columns: {
+          firstName: true,
+          lastName: true,
+        },
+      },
+      doctor: {
+        columns: {
+          specialization: true,
+        },
+        with: {
+          user: {
+            columns: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
+      prescriptions: true,
+      payments: true,
+      complaints: true,
+    },
+    orderBy: desc(appointments.appointmentId),
+    offset: (page - 1) * pageSize,
+    limit: pageSize,
+  });
+
+  return appointmentsList;
+};
