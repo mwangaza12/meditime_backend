@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
-import { PrescriptionInsert, prescriptions, PrescriptionSelect } from "../drizzle/schema"
+import { doctors, PrescriptionInsert, prescriptions, PrescriptionSelect } from "../drizzle/schema"
 
 
 export const getPrescriptionService = async(page: number, pageSize: number): Promise<PrescriptionSelect[] | null> => {
@@ -43,11 +43,32 @@ export const getPrescriptionByIdService = async (prescriptionId: number): Promis
     return prescription;
 }
 
-export const createPrescriptionService = async (prescription: PrescriptionInsert): Promise<PrescriptionSelect> => {
-    const [newPrescription] = await db.insert(prescriptions).values(prescription).returning();
+export const createPrescriptionService = async (prescription: PrescriptionInsert): Promise<PrescriptionSelect | null> => {
+    const { doctorId: userId, ...rest } = prescription;
+
+    if (!userId) {
+        throw new Error("Missing doctor userId.");
+    }
+
+    const doctorRecord = await db.query.doctors.findFirst({
+        where: eq(doctors.userId, userId),  // ✅ userId is now guaranteed to be a number
+        columns: { doctorId: true },
+    });
+
+    if (!doctorRecord) {
+        throw new Error("No doctor found for the provided user.");
+    }
+
+    const actualDoctorId = doctorRecord.doctorId;
+
+    const [newPrescription] = await db.insert(prescriptions).values({
+        ...rest,
+        doctorId: actualDoctorId,
+    }).returning();
 
     return newPrescription;
-}
+};
+
 
 export const updatePrescriptionService = async (prescriptionId: number, prescription: PrescriptionInsert): Promise<PrescriptionSelect | undefined> => {
     const [updatedPrescription] = await db.update(prescriptions)
@@ -92,31 +113,41 @@ export const getPrescriptionsByUserIdService = async (userId: number,page: numbe
     return prescriptionsList;
 }
 
-export const getPrescriptionsByDoctorIdService = async (userId: number,page: number, pageSize: number):  Promise<PrescriptionSelect[] | null> => {
+export const getPrescriptionsByDoctorIdService = async (doctorId: number,page: number,pageSize: number): Promise<PrescriptionSelect[] | null> => {
+
+    const doctorRecord = await db.query.doctors.findFirst({
+        where: eq(doctors.userId, doctorId),  // ✅ userId is now guaranteed to be a number
+        columns: { doctorId: true },
+    });
+
+    if (!doctorRecord) {
+        throw new Error("No doctor found for the provided user.");
+    }
+
+    const actualDoctorId = doctorRecord.doctorId;
     const prescriptionsList = await db.query.prescriptions.findMany({
-        where: eq(prescriptions.doctorId, userId),
+        where: eq(prescriptions.doctorId, actualDoctorId),
         with: {
-            doctor: {
-                with: {
-                    user: {
-                        columns:{
-                            password: false,
-                        }
-                    }
-                }
+        doctor: {
+            with: {
+            user: {
+                columns: {
+                password: false,
+                },
             },
-            patient: {
-                columns:{
-                    password: false
-                }
             },
-            appointment: true
+        },
+        patient: {
+            columns: {
+            password: false,
+            },
+        },
+        appointment: true,
         },
         orderBy: desc(prescriptions.prescriptionId),
         offset: (page - 1) * pageSize,
         limit: pageSize,
+    });
 
-    })
-
-    return prescriptionsList;
-}
+    return prescriptionsList.length > 0 ? prescriptionsList : null;
+};

@@ -127,17 +127,16 @@ export const getPrescriptionsByUserId = async (req: Request, res: Response) => {
 
 export const getPrescriptionsByDoctorId = async (req: Request, res: Response) => {
     try {
-        const userId = Number(req.query.userId);  // Using query param: /prescriptions/user?userId=123
-        console.log(userId);
+        const doctorId = Number(req.query.doctorId);  // Using query param: /prescriptions/user?doctorId=123
 
-        if (isNaN(userId)) {
-             res.status(400).json({ message: "Invalid or missing userId" });
+        if (isNaN(doctorId)) {
+             res.status(400).json({ message: "Invalid or missing doctorId" });
              return;
         }
         const page=1;
         const pageSize = 10;
 
-        const prescriptions = await getPrescriptionsByDoctorIdService(userId, page, pageSize);
+        const prescriptions = await getPrescriptionsByDoctorIdService(doctorId, page, pageSize);
 
         if (!prescriptions) {
              res.status(404).json({ message: "No prescriptions found for this user." });
