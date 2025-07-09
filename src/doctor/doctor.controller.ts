@@ -1,28 +1,31 @@
 import { Request, Response } from "express";
-import { createDoctorService, deleteDoctorService, getDoctorByIdService, getDoctorsService, updateDoctorService } from "./doctor.service";
+import { createDoctorService, deleteDoctorService, getDoctorByIdService, getDoctorsService, updateDoctorService,getUserDoctorsService } from "./doctor.service";
 import { createDoctorValidator } from "../validators/doctor.validator";
 
-export const getDoctors = async(req: Request, res: Response) => {
-    const page = Number(req.query.page) || 1; // Default to page 1 if not provided
-    const pageSize = Number(req.query.pageSize) || 10; // Default to page size of 10 if not provide
+export const getDoctors = async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const pageSize = Number(req.query.pageSize) || 10;
 
-     if (page <= 0 || pageSize <= 0) {
-        res.status(400).json({ error: "Invalid page or pageSize" });
-        return;
+  if (page <= 0 || pageSize <= 0) {
+    res.status(400).json({ error: "Invalid page or pageSize" });
+    return;
+  }
+
+  try {
+    const { doctors, total } = await getDoctorsService(page, pageSize);
+
+    if (!doctors || doctors.length === 0) {
+      res.status(404).json({ error: "No doctors found" });
+      return;
     }
 
-    try {
-        const doctors = await getDoctorsService(page, pageSize);
-        if (!doctors || doctors.length === 0) {
-            res.status(404).json({ error: "No doctors found" });
-            return;
-        }
-        res.status(200).json(doctors);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch doctors" });
-        return
-    }
-}
+    res.status(200).json({ doctors, total });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch doctors" });
+  }
+};
+
 
 export const getDoctorById = async(req: Request, res: Response) => {
     const doctorId = parseInt(req.params.id);
@@ -103,3 +106,31 @@ export const deleteDoctor = async(req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to delete doctor" });
     }
 }
+
+export const getUserDoctors = async (req: Request, res: Response) => {
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
+
+    if (page <= 0 || pageSize <= 0) {
+        res.status(400).json({ error: "Invalid page or pageSize" });
+        return;
+    }
+
+    try {
+        const result = await getUserDoctorsService(page, pageSize);
+        
+        if (!result || result.doctors.length === 0) {
+            res.status(404).json({ error: "No doctors found" });
+            return;
+        }
+
+        res.status(200).json({
+            doctors: result.doctors,
+            total: result.total,
+            page,
+            pageSize
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch doctors" });
+    }
+};

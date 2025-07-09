@@ -1,25 +1,31 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import db from "../drizzle/db";
-import { DoctorInsert, doctors, DoctorSelect } from "../drizzle/schema";
+import { DoctorInsert, doctors, DoctorSelect, users, UserSelect } from "../drizzle/schema";
 
-export const getDoctorsService = async (page: number, pageSize: number): Promise<DoctorSelect[]> => {
-    const doctorsList = await db.query.doctors.findMany({
+export const getDoctorsService = async (page: number, pageSize: number) => {
+    const [doctorsList, totalResult] = await Promise.all([
+        db.query.doctors.findMany({
         with: {
             appointments: true,
             prescriptions: true,
             user: {
-                columns:{
-                    password: false
-                }
-            }
+            columns: {
+                password: false,
+            },
+            },
         },
         orderBy: desc(doctors.doctorId),
-        offset: pageSize * (page - 1), // Calculate offset based on page and pageSize
+        offset: pageSize * (page - 1),
         limit: pageSize,
-    });
+        }),
+        db.select({ count: sql<number>`count(*)` }).from(doctors), // Correct way to count
+    ]);
 
-    return doctorsList;
-}
+    const totalCount = totalResult[0]?.count ?? 0;
+
+    return { doctors: doctorsList, total: totalCount };
+};
+
 
 export const getDoctorByIdService = async (doctorId: number): Promise<DoctorSelect | undefined> => {
     const doctor = await db.query.doctors.findFirst({
@@ -52,3 +58,19 @@ export const deleteDoctorService = async (doctorId: number): Promise<string> => 
     await db.delete(doctors).where(eq(doctors.doctorId, doctorId));
     return "Doctor deleted successfully 😎";
 }
+
+export const getUserDoctorsService = async (page: number, pageSize: number): Promise<{ doctors: UserSelect[]; total: number } | null> => {
+    const [doctorsList, totalResult] = await Promise.all([
+        db.query.users.findMany({
+            where: eq(users.role, 'doctor'),
+            orderBy: desc(users.userId),
+            offset: pageSize * (page - 1),
+            limit: pageSize,
+        }),
+        db.select({ count: sql<number>`count(*)` }).from(doctors),
+    ]);
+
+    const totalCount = totalResult[0]?.count ?? 0;
+
+    return { doctors: doctorsList, total: totalCount };
+};
