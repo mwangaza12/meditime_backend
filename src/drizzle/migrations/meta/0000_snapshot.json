@@ -1,5 +1,5 @@
 {
-  "id": "70d336e9-14dd-4752-9bed-d2ff6413e3f3",
+  "id": "eab8b304-5590-43bf-9d9b-cf10e536d877",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -34,9 +34,16 @@
         },
         "timeSlot": {
           "name": "timeSlot",
-          "type": "varchar(50)",
+          "type": "time",
           "primaryKey": false,
           "notNull": false
+        },
+        "durationMinutes": {
+          "name": "durationMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 30
         },
         "totalAmount": {
           "name": "totalAmount",
@@ -49,7 +56,8 @@
           "type": "appointmentStatus",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'pending'"
         },
         "createdAt": {
           "name": "createdAt",
@@ -68,17 +76,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "appointments_userId_users_user_id_fk": {
-          "name": "appointments_userId_users_user_id_fk",
+        "appointments_userId_users_userId_fk": {
+          "name": "appointments_userId_users_userId_fk",
           "tableFrom": "appointments",
           "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
-            "user_id"
+            "userId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "appointments_doctorId_doctors_doctorId_fk": {
@@ -91,7 +99,7 @@
           "columnsTo": [
             "doctorId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -135,9 +143,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "status": {
-          "name": "status",
-          "type": "status",
+        "complaintStatus": {
+          "name": "complaintStatus",
+          "type": "complaintStatus",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
@@ -159,17 +167,17 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "complaints_userId_users_user_id_fk": {
-          "name": "complaints_userId_users_user_id_fk",
+        "complaints_userId_users_userId_fk": {
+          "name": "complaints_userId_users_userId_fk",
           "tableFrom": "complaints",
           "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
-            "user_id"
+            "userId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "complaints_relatedAppointmentId_appointments_appointmentId_fk": {
@@ -182,7 +190,86 @@
           "columnsTo": [
             "appointmentId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.doctorAvailability": {
+      "name": "doctorAvailability",
+      "schema": "",
+      "columns": {
+        "availabilityId": {
+          "name": "availabilityId",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "doctorId": {
+          "name": "doctorId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dayOfWeek": {
+          "name": "dayOfWeek",
+          "type": "dayOfWeek",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "startTime": {
+          "name": "startTime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "endTime": {
+          "name": "endTime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "slotDurationMinutes": {
+          "name": "slotDurationMinutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 30
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "doctorAvailability_doctorId_doctors_doctorId_fk": {
+          "name": "doctorAvailability_doctorId_doctors_doctorId_fk",
+          "tableFrom": "doctorAvailability",
+          "tableTo": "doctors",
+          "columnsFrom": [
+            "doctorId"
+          ],
+          "columnsTo": [
+            "doctorId"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -208,21 +295,15 @@
           "primaryKey": false,
           "notNull": false
         },
-        "specialization": {
-          "name": "specialization",
-          "type": "varchar(255)",
+        "specializationId": {
+          "name": "specializationId",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
         "contactPhone": {
           "name": "contactPhone",
           "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "availableDays": {
-          "name": "availableDays",
-          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
@@ -243,17 +324,30 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "doctors_userId_users_user_id_fk": {
-          "name": "doctors_userId_users_user_id_fk",
+        "doctors_userId_users_userId_fk": {
+          "name": "doctors_userId_users_userId_fk",
           "tableFrom": "doctors",
           "tableTo": "users",
           "columnsFrom": [
             "userId"
           ],
           "columnsTo": [
-            "user_id"
+            "userId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "doctors_specializationId_specializations_specializationId_fk": {
+          "name": "doctors_specializationId_specializations_specializationId_fk",
+          "tableFrom": "doctors",
+          "tableTo": "specializations",
+          "columnsFrom": [
+            "specializationId"
+          ],
+          "columnsTo": [
+            "specializationId"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -340,7 +434,7 @@
           "columnsTo": [
             "appointmentId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -411,7 +505,7 @@
           "columnsTo": [
             "appointmentId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "prescriptions_doctorId_doctors_doctorId_fk": {
@@ -424,20 +518,20 @@
           "columnsTo": [
             "doctorId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "prescriptions_patientId_users_user_id_fk": {
-          "name": "prescriptions_patientId_users_user_id_fk",
+        "prescriptions_patientId_users_userId_fk": {
+          "name": "prescriptions_patientId_users_userId_fk",
           "tableFrom": "prescriptions",
           "tableTo": "users",
           "columnsFrom": [
             "patientId"
           ],
           "columnsTo": [
-            "user_id"
+            "userId"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -447,12 +541,51 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.specializations": {
+      "name": "specializations",
+      "schema": "",
+      "columns": {
+        "specializationId": {
+          "name": "specializationId",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "specializations_name_unique": {
+          "name": "specializations_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.users": {
       "name": "users",
       "schema": "",
       "columns": {
-        "user_id": {
-          "name": "user_id",
+        "userId": {
+          "name": "userId",
           "type": "serial",
           "primaryKey": true,
           "notNull": true
@@ -463,8 +596,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "lastname": {
-          "name": "lastname",
+        "lastName": {
+          "name": "lastName",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
@@ -557,14 +690,27 @@
         "cancelled"
       ]
     },
-    "public.status": {
-      "name": "status",
+    "public.complaintStatus": {
+      "name": "complaintStatus",
       "schema": "public",
       "values": [
         "open",
         "in_progress",
         "resolved",
         "closed"
+      ]
+    },
+    "public.dayOfWeek": {
+      "name": "dayOfWeek",
+      "schema": "public",
+      "values": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday"
       ]
     },
     "public.paymentStatus": {

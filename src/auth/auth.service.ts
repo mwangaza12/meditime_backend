@@ -2,11 +2,16 @@ import db from "../drizzle/db";
 import { UserInsert, UserSelect, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
-export const registerUserService = async(user: UserInsert): Promise<string> => {
-    await db.insert(users).values(user);
+export const registerUserService = async(user: UserInsert): Promise<UserSelect> => {
+    const [newUser] = await db.insert(users).values(user).returning();
 
-    return "User registered successfully";
+    if (!newUser) {
+        throw new Error("Failed to create user");
+    }
+
+    return newUser;
 }
+
 
 export const getUserByEmailService = async(email: string): Promise<UserSelect | undefined> => {
     const user = await db.query.users.findFirst({

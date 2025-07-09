@@ -34,6 +34,7 @@ export const registerUser = async (req: Request, res: Response) => {
         // Create user
         const newUser = await registerUserService(user);
 
+        console.log(newUser);
         // Send notification email
         const subject = "Account Created Successfully";
         const html = `
