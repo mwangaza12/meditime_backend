@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { and, eq, sql, desc } from "drizzle-orm";
 import db from "../drizzle/db";
 import { DoctorInsert, doctors, DoctorSelect, users, UserSelect } from "../drizzle/schema";
 
@@ -60,17 +60,36 @@ export const deleteDoctorService = async (doctorId: number): Promise<string> => 
 }
 
 export const getUserDoctorsService = async (page: number, pageSize: number): Promise<{ doctors: UserSelect[]; total: number } | null> => {
-    const [doctorsList, totalResult] = await Promise.all([
-        db.query.users.findMany({
-            where: eq(users.role, 'doctor'),
-            orderBy: desc(users.userId),
-            offset: pageSize * (page - 1),
-            limit: pageSize,
-        }),
-        db.select({ count: sql<number>`count(*)` }).from(doctors),
-    ]);
+  // 1. Get userIds of existing doctors (may include nulls)
+  const existingDoctorIdsResult = await db.select({ userId: doctors.userId }).from(doctors);
 
-    const totalCount = totalResult[0]?.count ?? 0;
+  // 2. Filter out nulls
+  const existingDoctorIds = existingDoctorIdsResult
+    .map(d => d.userId)
+    .filter((id): id is number => id !== null);
 
-    return { doctors: doctorsList, total: totalCount };
+  let whereCondition;
+
+  if (existingDoctorIds.length > 0) {
+    whereCondition = sql`(${users.role} = 'doctor' AND ${users.userId} NOT IN (${sql.join(existingDoctorIds, sql.raw(', '))}))`;
+  } else {
+    whereCondition = eq(users.role, 'doctor');
+  }
+
+  const [doctorsList, totalResult] = await Promise.all([
+    db.query.users.findMany({
+      where: whereCondition,
+      orderBy: desc(users.userId),
+      offset: pageSize * (page - 1),
+      limit: pageSize,
+    }),
+    db.select({ count: sql<number>`count(*)` })
+      .from(users)
+      .where(whereCondition),
+  ]);
+
+  const totalCount = totalResult[0]?.count ?? 0;
+
+  return { doctors: doctorsList, total: totalCount };
 };
+
