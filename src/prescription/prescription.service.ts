@@ -6,8 +6,20 @@ import { PrescriptionInsert, prescriptions, PrescriptionSelect } from "../drizzl
 export const getPrescriptionService = async(page: number, pageSize: number): Promise<PrescriptionSelect[] | null> => {
     const prescriptionsList = await db.query.prescriptions.findMany({
         with: {
-            doctor: true,
-            patient: true,
+            doctor: {
+                with: {
+                    user: {
+                        columns:{
+                            password: false,
+                        }
+                    }
+                }
+            },
+            patient: {
+                columns:{
+                    password: false
+                }
+            },
             appointment: true,
         },
         orderBy: desc(prescriptions.prescriptionId),
@@ -49,4 +61,62 @@ export const updatePrescriptionService = async (prescriptionId: number, prescrip
 export const deletePrescriptionService = async (prescriptionId: number): Promise<string> => {
     await db.delete(prescriptions).where(eq(prescriptions.prescriptionId, prescriptionId));
     return "Prescription deleted successfully";
+}
+
+export const getPrescriptionsByUserIdService = async (userId: number,page: number, pageSize: number):  Promise<PrescriptionSelect[] | null> => {
+    const prescriptionsList = await db.query.prescriptions.findMany({
+        where: eq(prescriptions.patientId, userId),
+        with: {
+            doctor: {
+                with: {
+                    user: {
+                        columns:{
+                            password: false,
+                        }
+                    }
+                }
+            },
+            patient: {
+                columns:{
+                    password: false
+                }
+            },
+            appointment: true
+        },
+        orderBy: desc(prescriptions.prescriptionId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+
+    })
+
+    return prescriptionsList;
+}
+
+export const getPrescriptionsByDoctorIdService = async (userId: number,page: number, pageSize: number):  Promise<PrescriptionSelect[] | null> => {
+    const prescriptionsList = await db.query.prescriptions.findMany({
+        where: eq(prescriptions.doctorId, userId),
+        with: {
+            doctor: {
+                with: {
+                    user: {
+                        columns:{
+                            password: false,
+                        }
+                    }
+                }
+            },
+            patient: {
+                columns:{
+                    password: false
+                }
+            },
+            appointment: true
+        },
+        orderBy: desc(prescriptions.prescriptionId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+
+    })
+
+    return prescriptionsList;
 }

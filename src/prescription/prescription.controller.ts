@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createPrescriptionService, deletePrescriptionService, getPrescriptionByIdService, getPrescriptionService } from "./prescription.service";
+import { createPrescriptionService, deletePrescriptionService, getPrescriptionByIdService, getPrescriptionService,getPrescriptionsByUserIdService,getPrescriptionsByDoctorIdService } from "./prescription.service";
 import { prescriptionValidator } from "../validators/prescription.validator";
 
 export const getPrescriptions = async (req: Request, res: Response) => {
@@ -96,3 +96,59 @@ export const deletePrescription = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to delete prescription" });
     }
 }
+
+export const getPrescriptionsByUserId = async (req: Request, res: Response) => {
+    try {
+        const userId = Number(req.query.userId);  // Using query param: /prescriptions/user?userId=123
+        console.log(userId);
+
+        if (isNaN(userId)) {
+             res.status(400).json({ message: "Invalid or missing userId" });
+             return;
+        }
+        const page=1;
+        const pageSize = 10;
+
+        const prescriptions = await getPrescriptionsByUserIdService(userId, page, pageSize);
+
+        if (!prescriptions) {
+             res.status(404).json({ message: "No prescriptions found for this user." });
+             return;
+        }
+
+         res.status(200).json(prescriptions);
+         return;
+    } catch (error) {
+        console.error("Failed to get prescriptions:", error);
+         res.status(500).json({ message: "Internal server error" });
+         return;
+    }
+};
+
+export const getPrescriptionsByDoctorId = async (req: Request, res: Response) => {
+    try {
+        const userId = Number(req.query.userId);  // Using query param: /prescriptions/user?userId=123
+        console.log(userId);
+
+        if (isNaN(userId)) {
+             res.status(400).json({ message: "Invalid or missing userId" });
+             return;
+        }
+        const page=1;
+        const pageSize = 10;
+
+        const prescriptions = await getPrescriptionsByDoctorIdService(userId, page, pageSize);
+
+        if (!prescriptions) {
+             res.status(404).json({ message: "No prescriptions found for this user." });
+             return;
+        }
+
+         res.status(200).json(prescriptions);
+         return;
+    } catch (error) {
+        console.error("Failed to get prescriptions:", error);
+         res.status(500).json({ message: "Internal server error" });
+         return;
+    }
+};
