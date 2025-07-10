@@ -11,6 +11,7 @@ import complaintRouter from './complaint/complaint.route';
 import userRouter from './user/user.route';
 import { setupSwagger } from './swagger';
 import specializationRouter from './specialization/specialization.route';
+import doctorAvailabilityRouter from './doctorAvailability/doctorAvailabilty.route';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api', paymentRouter);
 app.use('/api', complaintRouter);
 app.use('/api', userRouter);
 app.use('/api', specializationRouter);
+app.use('/api', doctorAvailabilityRouter);
 
 //default route
 app.get('/', (req, res:Response) => {

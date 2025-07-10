@@ -6,6 +6,7 @@ export const getDoctorsService = async (page: number, pageSize: number) => {
     const [doctorsList, totalResult] = await Promise.all([
         db.query.doctors.findMany({
         with: {
+            availability: true,
             appointments: true,
             prescriptions: true,
             user: {
@@ -13,6 +14,7 @@ export const getDoctorsService = async (page: number, pageSize: number) => {
                 password: false,
             },
             },
+            specialization: true
         },
         orderBy: desc(doctors.doctorId),
         offset: pageSize * (page - 1),
@@ -31,8 +33,15 @@ export const getDoctorByIdService = async (doctorId: number): Promise<DoctorSele
     const doctor = await db.query.doctors.findFirst({
         where: (doctors) => eq(doctors.doctorId, doctorId),
         with: {
+            availability: true,
             appointments: true,
             prescriptions: true,
+            user: {
+            columns: {
+                password: false,
+            },
+            },
+            specialization: true
         },
     });
 
