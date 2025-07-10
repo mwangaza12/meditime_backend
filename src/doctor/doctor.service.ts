@@ -1,4 +1,4 @@
-import { and, eq, sql, desc } from "drizzle-orm";
+import { eq, sql, desc } from "drizzle-orm";
 import db from "../drizzle/db";
 import { DoctorInsert, doctors, DoctorSelect, users, UserSelect } from "../drizzle/schema";
 
@@ -102,3 +102,17 @@ export const getUserDoctorsService = async (page: number, pageSize: number): Pro
   return { doctors: doctorsList, total: totalCount };
 };
 
+export const getDoctorsBySpecializationService = async (specializationId: number): Promise<DoctorSelect[]> => {
+  const result = await db.query.doctors.findMany({
+    where: eq(doctors.specializationId, specializationId),
+    with: {
+      user: {
+        columns: { password: false },  // Remove sensitive fields
+      },
+      specialization: true,
+      availability: true,
+    },
+  });
+
+  return result;
+};

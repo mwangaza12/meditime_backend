@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createDoctorService, deleteDoctorService, getDoctorByIdService, getDoctorsService, updateDoctorService,getUserDoctorsService } from "./doctor.service";
+import { createDoctorService, deleteDoctorService, getDoctorByIdService, getDoctorsService, updateDoctorService,getUserDoctorsService, getDoctorsBySpecializationService } from "./doctor.service";
 import { createDoctorValidator } from "../validators/doctor.validator";
 
 export const getDoctors = async (req: Request, res: Response) => {
@@ -133,4 +133,28 @@ export const getUserDoctors = async (req: Request, res: Response) => {
     } catch (err) {
         res.status(500).json({ error: "Failed to fetch doctors" });
     }
+};
+
+export const getDoctorsBySpecialization = async (req: Request, res: Response) => {
+  const specializationId = Number(req.query.specializationId);
+  console.log(specializationId);
+
+  if (isNaN(specializationId)) {
+    res.status(400).json({ error: "Invalid specializationId" });
+    return;
+  }
+
+  try {
+    const doctors = await getDoctorsBySpecializationService(specializationId);
+
+    if (!doctors || doctors.length === 0) {
+      res.status(404).json({ error: "No doctors found for this specialization" });
+      return;
+    }
+
+    res.status(200).json({ doctors });
+  } catch (error) {
+    console.error("Error fetching doctors by specialization:", error);
+    res.status(500).json({ error: "Failed to fetch doctors by specialization" });
+  }
 };
