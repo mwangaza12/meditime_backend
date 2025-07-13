@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
-import { PaymentInsert, payments, PaymentSelect } from "../drizzle/schema";
+import { appointments, AppointmentSelect, PaymentInsert, payments, PaymentSelect } from "../drizzle/schema";
 
 export const getAllPaymentsService = async(page:number, pageSize: number): Promise<PaymentSelect[] | null> => {
     const paymentList = await db.query.payments.findMany({
@@ -88,3 +88,28 @@ export const deletePaymentService = async (paymentId: number): Promise<string> =
     await db.delete(payments).where(eq(payments.paymentId, paymentId));
     return "Payment deleted successfully";
 }
+
+export const getPaymentsByUserIdService = async (userId: number,page: number,pageSize: number): Promise<AppointmentSelect[] | null> => {
+    const appointmentsWithPayments = await db.query.appointments.findMany({
+        where: eq(appointments.userId, userId),
+        with: {
+        payments: true,
+        user: {
+            columns: { password: false },
+        },
+        doctor: {
+            with: {
+            user: {
+                columns: { password: false },
+            },
+            },
+        },
+        },
+        orderBy: desc(appointments.appointmentId),
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
+    });
+
+    return appointmentsWithPayments;
+};
+

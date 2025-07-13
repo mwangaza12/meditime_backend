@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createPaymentService, deletePaymentService, getAllPaymentsService, getPaymentByIdService } from "./payment.service";
+import { createPaymentService, deletePaymentService, getAllPaymentsService, getPaymentByIdService, getPaymentsByUserIdService } from "./payment.service";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export const getAllPayments = async (req: Request, res: Response) => {
-    const page = Number(req.body.page);
+    const page = Number(req.query.page);
     const pageSize = Number(req.query.pageSize);
     
     try {
@@ -111,3 +111,30 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
   }
 };
 
+export const getPaymentsByUserId = async (req: Request, res: Response) => {
+    try {
+        const userId = Number(req.query.userId);  // Using query param: /appointments/user?userId=123
+        console.log(userId);
+
+        if (isNaN(userId)) {
+             res.status(400).json({ message: "Invalid or missing userId" });
+             return;
+        }
+        const page=1;
+        const pageSize = 10;
+
+        const appointments = await getPaymentsByUserIdService(userId, page, pageSize);
+
+        if (!appointments) {
+             res.status(404).json({ message: "No appointments found for this user." });
+             return;
+        }
+
+         res.status(200).json(appointments);
+         return;
+    } catch (error) {
+        console.error("Failed to get appointments:", error);
+         res.status(500).json({ message: "Internal server error" });
+         return;
+    }
+};

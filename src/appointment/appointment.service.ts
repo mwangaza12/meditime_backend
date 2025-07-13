@@ -12,9 +12,6 @@ export const getAllAppointmentsService = async (page: number, pageSize: number):
                 }
             },
             doctor: {
-                columns: {
-                    specialization: true
-                },
                 with: {
                     user: {
                         columns: {
@@ -23,6 +20,7 @@ export const getAllAppointmentsService = async (page: number, pageSize: number):
                             
                         }
                     },
+                    specialization: true
                 }
             },
             prescriptions: true,
@@ -46,9 +44,6 @@ export const getAppointmentByIdService = async (appointmentId: number): Promise<
                 }
             },
             doctor: {
-                columns: {
-                    specialization: true
-                },
                 with: {
                     user: {
                         columns: {
@@ -57,6 +52,7 @@ export const getAppointmentByIdService = async (appointmentId: number): Promise<
                             
                         }
                     },
+                    specialization: true
                 }
             },
             prescriptions: true,
@@ -99,9 +95,6 @@ export const getAppointmentsByUserIdService = async (userId: number,page: number
                 }
             },
             doctor: {
-                columns: {
-                    specialization: true
-                },
                 with: {
                     user: {
                         columns: {
@@ -110,6 +103,7 @@ export const getAppointmentsByUserIdService = async (userId: number,page: number
                             
                         }
                     },
+                    specialization: true
                 }
             },
             prescriptions: true,
@@ -150,9 +144,7 @@ export const getAppointmentsByDoctorIdService = async (userId: number, page: num
         },
       },
       doctor: {
-        columns: {
-          specialization: true,
-        },
+        
         with: {
           user: {
             columns: {
@@ -160,6 +152,7 @@ export const getAppointmentsByDoctorIdService = async (userId: number, page: num
               lastName: true,
             },
           },
+          specialization: true
         },
       },
       prescriptions: true,
