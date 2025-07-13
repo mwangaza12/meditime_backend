@@ -2,7 +2,6 @@ import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
 import { PaymentInsert, payments, PaymentSelect } from "../drizzle/schema";
 
-
 export const getAllPaymentsService = async(page:number, pageSize: number): Promise<PaymentSelect[] | null> => {
     const paymentList = await db.query.payments.findMany({
         with: {
@@ -20,7 +19,7 @@ export const getAllPaymentsService = async(page:number, pageSize: number): Promi
                     },
                     doctor:{
                         columns: {
-                            specialization: true
+                            specializationId: true
                         },
                         with: {
                             user: {
@@ -60,7 +59,7 @@ export const getPaymentByIdService = async (paymentId: number): Promise<PaymentS
                     },
                     doctor:{
                         columns: {
-                            specialization: true
+                            specializationId: true
                         },
                         with: {
                             user: {

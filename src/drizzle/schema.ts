@@ -86,7 +86,6 @@ export const payments = pgTable("payments", {
     amount: decimal("amount", { precision: 10, scale: 2 }),
     paymentStatus: paymentStatusEnum("paymentStatus").default("pending"),
     transactionId: varchar("transactionId", { length: 255 }),
-    paymentDate: date("paymentDate"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });

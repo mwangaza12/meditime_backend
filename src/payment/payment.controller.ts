@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import { createPaymentService, deletePaymentService, getAllPaymentsService, getPaymentByIdService } from "./payment.service";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-06-30.basil',
+});
 
 export const getAllPayments = async (req: Request, res: Response) => {
     const page = Number(req.body.page);
@@ -37,14 +42,20 @@ export const getPaymentById = async (req: Request, res: Response) => {
 }
 
 export const createPayment = async (req: Request, res: Response) => {
-    const paymentData = req.body; // Assuming validation is done elsewhere
-    try {
-        const newPayment = await createPaymentService(paymentData);
-        res.status(201).json(newPayment);
-    } catch (error) {
-        res.status(500).json({ error: "Failed to create payment" });
+    const paymentData = req.body;
+    try{
+        const payment = await createPaymentService(paymentData);
+
+        if(!payment){
+            res.status(400).json({error: "Payment not created to database"});
+            return
+        }
+
+        res.status(201).json({message: "Payment created Successfully"});
+    }catch(err: any){
+        res.status(500).json({message: "Failed to  created a payment", error: err.error})
     }
-}
+};
 
 export const deletePayment = async (req: Request, res: Response) => {
     const paymentId = parseInt(req.params.id);
@@ -60,3 +71,43 @@ export const deletePayment = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to delete payment" });
     }
 }
+
+export const createCheckoutSession = async (req: Request, res: Response) => {
+  const { amount, appointmentId } = req.body;
+
+  if (!amount || isNaN(amount)) {
+    res.status(400).json({ error: 'Invalid input' });
+    return;
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            unit_amount: amount,
+            product_data: {
+              name: 'Appointment Payment',
+              description: 'Doctor Consultation',
+            },
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        appointmentId: appointmentId ? String(appointmentId) : '',
+      },
+      success_url: 'http://localhost:5173/user-dashboard',
+      cancel_url: 'http://localhost:5173/payment-cancelled',
+    });
+
+    res.status(200).json({ url: session.url });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to create checkout session' });
+  }
+};
+
