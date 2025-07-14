@@ -1,103 +1,102 @@
-import {pgTable,serial,varchar,text,decimal,integer,date,time,timestamp,pgEnum,boolean} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import {pgTable,serial,varchar,text,numeric,integer,date,time,timestamp,pgEnum,boolean,} from "drizzle-orm/pg-core";
 
 // Enums
 export const userRoleEnum = pgEnum("role", ["user", "admin", "doctor"]);
 export const appointmentStatusEnum = pgEnum("appointmentStatus", ["pending", "confirmed", "cancelled"]);
-export const complaintStatusEnum = pgEnum("complaintStatus", ["open", "in_progress", "resolved", "closed"]);
+export const complaintStatusEnum = pgEnum("complaintStatus", ["open", "inProgress", "resolved", "closed"]);
 export const paymentStatusEnum = pgEnum("paymentStatus", ["pending", "completed", "failed"]);
-export const dayOfWeekEnum = pgEnum("dayOfWeek", ["monday","tuesday","wednesday","thursday","friday","saturday","sunday",]);
+export const dayOfWeekEnum = pgEnum("dayOfWeek", ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]);
 
-
-// Specializations Table
+// Specializations
 export const specializations = pgTable("specializations", {
     specializationId: serial("specializationId").primaryKey(),
-    name: varchar("name", { length: 100 }).unique(),
-    description: text("description"),
+    name: varchar("name", { length: 100 }).notNull().unique(),
+    description: text("description").notNull(),
 });
 
-// Users Table
+// Users
 export const users = pgTable("users", {
     userId: serial("userId").primaryKey(),
-    firstName: varchar("firstName", { length: 255 }),
-    lastName: varchar("lastName", { length: 255 }),
-    email: varchar("email", { length: 255 }).unique(),
-    emailVerified: boolean("emailVerified").default(false),
+    firstName: varchar("firstName", { length: 255 }).notNull(),
+    lastName: varchar("lastName", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    emailVerified: boolean("emailVerified").notNull().default(false),
     confirmationCode: varchar("confirmationCode", { length: 255 }).default(""),
-    password: varchar("password", { length: 255 }),
+    password: varchar("password", { length: 255 }).notNull(),
     contactPhone: varchar("contactPhone", { length: 20 }),
     address: text("address"),
-    role: userRoleEnum("role").default("user"),
+    profileImageUrl: text("profileImageUrl"),
+    role: userRoleEnum("role").notNull().default("user"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// Doctors Table
+// Doctors
 export const doctors = pgTable("doctors", {
     doctorId: serial("doctorId").primaryKey(),
-    userId: integer("userId").references(() => users.userId, { onDelete: "cascade" }).unique(),
+    userId: integer("userId").notNull().unique().references(() => users.userId, { onDelete: "cascade" }),
     specializationId: integer("specializationId").references(() => specializations.specializationId, { onDelete: "set null" }),
-    contactPhone: varchar("contactPhone", { length: 20 }),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// Doctor Availability Table
+// Doctor Availability
 export const doctorAvailability = pgTable("doctorAvailability", {
     availabilityId: serial("availabilityId").primaryKey(),
-    doctorId: integer("doctorId").references(() => doctors.doctorId, { onDelete: "cascade" }),
-    dayOfWeek: dayOfWeekEnum("dayOfWeek"),
-    startTime: time("startTime"),
-    endTime: time("endTime"),
-    slotDurationMinutes: integer("slotDurationMinutes").default(30),
+    doctorId: integer("doctorId").notNull().references(() => doctors.doctorId, { onDelete: "cascade" }),
+    dayOfWeek: dayOfWeekEnum("dayOfWeek").notNull(),
+    startTime: time("startTime").notNull(),
+    endTime: time("endTime").notNull(),
+    slotDurationMinutes: integer("slotDurationMinutes").notNull().default(30),
+    amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// Appointments Table
+// Appointments
 export const appointments = pgTable("appointments", {
     appointmentId: serial("appointmentId").primaryKey(),
-    userId: integer("userId").references(() => users.userId, { onDelete: "cascade" }),
-    doctorId: integer("doctorId").references(() => doctors.doctorId, { onDelete: "cascade" }),
-    appointmentDate: date("appointmentDate"),
-    timeSlot: time("timeSlot"),
-    durationMinutes: integer("durationMinutes").default(30),
-    totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }),
-    appointmentStatus: appointmentStatusEnum("appointmentStatus").default("pending"),
+    userId: integer("userId").notNull().references(() => users.userId, { onDelete: "cascade" }),
+    doctorId: integer("doctorId").notNull().references(() => doctors.doctorId, { onDelete: "cascade" }),
+    availabilityId: integer("availabilityId").notNull().references(() => doctorAvailability.availabilityId, { onDelete: "cascade" }),
+    totalAmount: numeric("totalAmount", { precision: 10, scale: 2 }).notNull(),
+    appointmentStatus: appointmentStatusEnum("appointmentStatus").notNull().default("pending"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// Prescriptions Table
+
+// Prescriptions
 export const prescriptions = pgTable("prescriptions", {
     prescriptionId: serial("prescriptionId").primaryKey(),
-    appointmentId: integer("appointmentId").references(() => appointments.appointmentId, { onDelete: "cascade" }),
-    doctorId: integer("doctorId").references(() => doctors.doctorId, { onDelete: "cascade" }),
-    patientId: integer("patientId").references(() => users.userId, { onDelete: "cascade" }),
+    appointmentId: integer("appointmentId").notNull().references(() => appointments.appointmentId, { onDelete: "cascade" }),
+    doctorId: integer("doctorId").notNull().references(() => doctors.doctorId, { onDelete: "cascade" }),
+    patientId: integer("patientId").notNull().references(() => users.userId, { onDelete: "cascade" }),
     notes: text("notes"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// Payments Table
+// Payments
 export const payments = pgTable("payments", {
     paymentId: serial("paymentId").primaryKey(),
-    appointmentId: integer("appointmentId").references(() => appointments.appointmentId, { onDelete: "cascade" }),
-    amount: decimal("amount", { precision: 10, scale: 2 }),
-    paymentStatus: paymentStatusEnum("paymentStatus").default("pending"),
-    transactionId: varchar("transactionId", { length: 255 }),
+    appointmentId: integer("appointmentId").notNull().references(() => appointments.appointmentId, { onDelete: "cascade" }),
+    amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+    paymentStatus: paymentStatusEnum("paymentStatus").notNull().default("pending"),
+    transactionId: varchar("transactionId", { length: 255 }).notNull(),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
-// Complaints Table
+// Complaints
 export const complaints = pgTable("complaints", {
     complaintId: serial("complaintId").primaryKey(),
-    userId: integer("userId").references(() => users.userId, { onDelete: "cascade" }),
+    userId: integer("userId").notNull().references(() => users.userId, { onDelete: "cascade" }),
     relatedAppointmentId: integer("relatedAppointmentId").references(() => appointments.appointmentId, { onDelete: "cascade" }),
-    subject: varchar("subject", { length: 255 }),
-    description: text("description"),
-    status: complaintStatusEnum("complaintStatus"),
+    subject: varchar("subject", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    status: complaintStatusEnum("complaintStatus").notNull().default("open"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
