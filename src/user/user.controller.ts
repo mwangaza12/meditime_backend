@@ -1,5 +1,5 @@
 import e, { Request, Response } from "express";
-import { deleteUserByIdService, getAllUsersService, getUserByIdService, updateUserByIdService, updateUserRoleService } from "./user.service";   
+import { deleteUserByIdService, getAllUsersService, getUserByIdService, updateUserByIdService, updateUserRoleService,updateProfileImageService } from "./user.service";   
 import { registerUserValidator } from "../validators/user.validator";
 
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -17,7 +17,6 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 };
-
 
 export const getUserById = async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id);
@@ -65,7 +64,6 @@ export const updateUserById = async (req: Request, res: Response) => {
     }
 }
 
-
 export const deleteUserById = async (req: Request, res: Response) => {
     const userId = parseInt(req.params.id);
     if (isNaN(userId)) {
@@ -108,3 +106,22 @@ export const updateUserRoleOnly = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const updateProfileImage = async (req: Request, res: Response) => {
+  const { id } = req.params; // ✅ grab from URL param
+  const { profileUrl } = req.body;
+
+  if (!id || !profileUrl) {
+    res.status(400).json({ error: "Missing userId or profileUrl" });
+    return
+  }
+
+  try {
+    const userId = parseInt(id);
+    const data = await updateProfileImageService(userId, profileUrl);
+    res.status(200).json({ message: "Image Updated successfully", data });
+  } catch (error: any) {
+    res.status(400).json({ error: "Failed to upload", err: error.message });
+  }
+};
+

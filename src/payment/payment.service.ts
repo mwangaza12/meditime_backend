@@ -6,32 +6,24 @@ export const getAllPaymentsService = async(page:number, pageSize: number): Promi
     const paymentList = await db.query.payments.findMany({
         with: {
             appointment: {
-                columns: {
-                    appointmentStatus: true,
-                    appointmentDate: true,
-                },
-                with: {
+                with:{
                     user: {
                         columns:{
-                            firstName: true,
-                            lastName: true
+                            password: false,
                         }
                     },
-                    doctor:{
-                        columns: {
-                            specializationId: true
-                        },
+                    doctor: {
                         with: {
                             user: {
                                 columns: {
-                                    firstName: true,
-                                    lastName: true
+                                    password: false,
                                 }
-                            }
+                            },
+                            specialization: true
                         }
                     }
                 }
-            },
+            }
         },
         orderBy: desc(payments.paymentId),
         offset: (page - 1) * pageSize,
@@ -46,32 +38,24 @@ export const getPaymentByIdService = async (paymentId: number): Promise<PaymentS
         where: eq(payments.paymentId, paymentId),
         with: {
             appointment: {
-                columns: {
-                    appointmentStatus: true,
-                    appointmentDate: true,
-                },
-                with: {
+                with:{
                     user: {
                         columns:{
-                            firstName: true,
-                            lastName: true
+                            password: false,
                         }
                     },
-                    doctor:{
-                        columns: {
-                            specializationId: true
-                        },
+                    doctor: {
                         with: {
                             user: {
                                 columns: {
-                                    firstName: true,
-                                    lastName: true
+                                    password: false,
                                 }
-                            }
-                        }
+                            },
+                            specialization: true
+                        },
                     }
                 }
-            },
+            }
         },
     });
 
@@ -93,15 +77,36 @@ export const getPaymentsByUserIdService = async (userId: number,page: number,pag
     const appointmentsWithPayments = await db.query.appointments.findMany({
         where: eq(appointments.userId, userId),
         with: {
-        payments: true,
+        payments: {
+            with: {
+                appointment: {
+                    with: {
+                        user: {
+                            columns: {
+                                password: false
+                            }
+                        },
+                        doctor: {
+                            with:{
+                                user:{
+                                    columns: {
+                                        password: false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         user: {
             columns: { password: false },
         },
         doctor: {
             with: {
-            user: {
-                columns: { password: false },
-            },
+                user: {
+                    columns: { password: false },
+                },
             },
         },
         },

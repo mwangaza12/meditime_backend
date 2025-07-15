@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService } from "./appointment.service";
+import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService,updateAppointmentStatusService } from "./appointment.service";
 import { appointmentValidator } from "../validators/appointment.validator";
 
 export const getAppointments = async (req: Request, res: Response) => {
@@ -155,4 +155,35 @@ export const getAppointmentsByDoctorId = async (req: Request, res: Response) => 
          res.status(500).json({ message: "Internal server error" });
          return;
     }
+};
+
+export const updateAppointmentStatus = async (req: Request, res: Response) => {
+  const appointmentId = parseInt(req.params.appointmentId);
+  const { status } = req.body;
+
+  if (isNaN(appointmentId)) {
+     res.status(400).json({ error: "Invalid appointment ID" });
+     return
+  }
+
+  if (!["pending", "confirmed", "cancelled"].includes(status)) {
+     res.status(400).json({ error: "Invalid status value" });
+     return
+  }
+
+  try {
+    const updated = await updateAppointmentStatusService(appointmentId, status);
+
+    if (!updated) {
+       res.status(404).json({ error: "Appointment not found" });
+       return
+    }
+
+     res.status(200).json({ message: "Appointment status updated", appointment: updated });
+     return
+  } catch (error) {
+    console.error("Failed to update appointment status:", error);
+     res.status(500).json({ error: "Failed to update appointment status" });
+     return
+  }
 };

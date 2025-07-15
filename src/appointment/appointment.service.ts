@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
-import { AppointmentInsert, appointments, AppointmentSelect, doctors } from "../drizzle/schema";
+import { AppointmentInsert, appointments, AppointmentSelect, AppointmentStatus, doctors } from "../drizzle/schema";
 
 export const getAllAppointmentsService = async (page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
     const appointmentsList = await db.query.appointments.findMany({
@@ -166,3 +166,14 @@ export const getAppointmentsByDoctorIdService = async (userId: number, page: num
 
   return appointmentsList;
 };
+
+export const updateAppointmentStatusService = async (appointmentId: number,status: AppointmentStatus): Promise<AppointmentSelect | undefined> => {
+    const [updatedAppointment] = await db
+        .update(appointments)
+        .set({ appointmentStatus: status }) // ✅ Typed correctly
+        .where(eq(appointments.appointmentId, appointmentId))
+        .returning();
+
+    return updatedAppointment;
+};
+

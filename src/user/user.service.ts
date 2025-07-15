@@ -34,16 +34,11 @@ export const getAllUsersService = async (page: number, pageSize: number) => {
     return { users: usersList, total: Number(count) };
 };
 
-
-
 export const getUserByIdService = async (userId: number): Promise<UserListItem | undefined> => {
     const user = await db.query.users.findFirst({
         where: eq(users.userId, userId),
         columns: {
-            firstName: true,
-            lastName: true,
-            contactPhone: true,
-            address: true,
+            password: false
         },
         with: {
             appointments: true,
@@ -69,13 +64,18 @@ export const deleteUserByIdService = async (userId: number): Promise<string> => 
     return `User with ID ${userId} deleted successfully`;
 }
 
-
 export const updateUserRoleService = async (id: number, role: UserRole): Promise<UserSelect> => {
   const [updatedUser] = await db
     .update(users)
     .set({ role })
     .where(eq(users.userId, id))
     .returning();
+
+  return updatedUser;
+};
+
+export const updateProfileImageService = async (id: number,imageUrl: string): Promise<UserSelect> => {
+  const [updatedUser] = await db.update(users).set({ profileImageUrl: imageUrl }).where(eq(users.userId, id)).returning();
 
   return updatedUser;
 };

@@ -3,7 +3,9 @@ import {pgTable,serial,varchar,text,numeric,integer,date,time,timestamp,pgEnum,b
 
 // Enums
 export const userRoleEnum = pgEnum("role", ["user", "admin", "doctor"]);
+export type UserRole = typeof userRoleEnum.enumValues[number];
 export const appointmentStatusEnum = pgEnum("appointmentStatus", ["pending", "confirmed", "cancelled"]);
+export type AppointmentStatus = typeof appointmentStatusEnum.enumValues[number];
 export const complaintStatusEnum = pgEnum("complaintStatus", ["open", "inProgress", "resolved", "closed"]);
 export const paymentStatusEnum = pgEnum("paymentStatus", ["pending", "completed", "failed"]);
 export const dayOfWeekEnum = pgEnum("dayOfWeek", ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]);
