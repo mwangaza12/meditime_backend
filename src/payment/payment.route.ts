@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { createPayment, deletePayment, getAllPayments, getPaymentById, createCheckoutSession,getPaymentsByUserId } from "./payment.controller";
 import { pagination } from "../middleware/pagination";
-import { adminAuth, adminOrUserAuth, userAuth } from "../middleware/bearAuth";
+import { adminAuth, adminOrUserAuth } from "../middleware/bearAuth";
 import { webhookHandler } from "./payment.webhook";
 const paymentRouter = Router();
 

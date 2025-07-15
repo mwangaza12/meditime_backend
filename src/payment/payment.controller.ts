@@ -114,7 +114,6 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
 export const getPaymentsByUserId = async (req: Request, res: Response) => {
     try {
         const userId = Number(req.query.userId);  // Using query param: /appointments/user?userId=123
-        console.log(userId);
 
         if (isNaN(userId)) {
              res.status(400).json({ message: "Invalid or missing userId" });

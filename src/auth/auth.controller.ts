@@ -135,7 +135,7 @@ export const passwordReset = async (req: Request, res: Response) => {
         const resetToken = jwt.sign({ userId: user.userId }, secret, { expiresIn: '1h' });
 
         // Send reset email (you can implement this function)
-        const results = await sendNotificationEmail(email, "Password Reset", user.firstName, `Click the link to reset your password: <a href="http://localhost:5000/api/auth/reset/${resetToken}">Reset Password</a>`);
+        const results = await sendNotificationEmail(email, "Password Reset", user.firstName, `Click the link to reset your password: <a href="http://localhost:5173/reset-password/${resetToken}">Reset Password</a>`);
         
         if (!results) {
             res.status(500).json({ error: "Failed to send reset email" });

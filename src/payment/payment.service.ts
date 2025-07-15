@@ -88,11 +88,12 @@ export const getPaymentsByUserIdService = async (userId: number,page: number,pag
                         },
                         doctor: {
                             with:{
+                                specialization: true,
                                 user:{
                                     columns: {
                                         password: false
                                     }
-                                }
+                                },
                             }
                         }
                     }
@@ -104,6 +105,7 @@ export const getPaymentsByUserIdService = async (userId: number,page: number,pag
         },
         doctor: {
             with: {
+                specialization: true,
                 user: {
                     columns: { password: false },
                 },
