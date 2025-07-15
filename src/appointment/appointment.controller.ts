@@ -104,7 +104,6 @@ export const deleteAppointment = async (req: Request, res: Response) => {
 export const getAppointmentsByUserId = async (req: Request, res: Response) => {
     try {
         const userId = Number(req.query.userId);  // Using query param: /appointments/user?userId=123
-        console.log(userId);
 
         if (isNaN(userId)) {
              res.status(400).json({ message: "Invalid or missing userId" });
@@ -132,7 +131,6 @@ export const getAppointmentsByUserId = async (req: Request, res: Response) => {
 export const getAppointmentsByDoctorId = async (req: Request, res: Response) => {
     try {
         const doctorId = Number(req.query.doctorId);  // Using query param: /appointments/user?doctorId=123
-        console.log(doctorId);
 
         if (isNaN(doctorId)) {
              res.status(400).json({ message: "Invalid or missing doctorId" });
