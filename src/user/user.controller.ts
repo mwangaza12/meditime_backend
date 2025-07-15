@@ -1,6 +1,8 @@
 import e, { Request, Response } from "express";
-import { deleteUserByIdService, getAllUsersService, getUserByIdService, updateUserByIdService, updateUserRoleService,updateProfileImageService } from "./user.service";   
+import { deleteUserByIdService, getAllUsersService, getUserByIdService, updateUserByIdService, updateUserRoleService,updateProfileImageService, updateUserPasswordService } from "./user.service";   
 import { registerUserValidator } from "../validators/user.validator";
+import bcrypt from "bcrypt";
+
 
 export const getAllUsers = async (req: Request, res: Response) => {
   const page = Number(req.query.page);
@@ -122,6 +124,45 @@ export const updateProfileImage = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Image Updated successfully", data });
   } catch (error: any) {
     res.status(400).json({ error: "Failed to upload", err: error.message });
+  }
+};
+
+export const updatePassword = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+     res.status(400).json({ error: "Current password or new password is missing" });
+     return
+  }
+
+  try {
+    const user = await getUserByIdService(id);
+
+    if (!user) {
+       res.status(404).json({ error: "User not found" });
+       return
+    }
+
+    // Compare current password with hashed password
+    const isMatch = await bcrypt.compare(currentPassword, user.password!);
+    if (!isMatch) {
+       res.status(401).json({ error: "Current password is incorrect" });
+       return
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    await updateUserPasswordService(user.email!, hashedPassword);
+
+     res.status(200).json({ message: "Password has been updated successfully" });
+     return
+  } catch (error: any) {
+     res.status(500).json({ error: error.message || "Server error" });
+     return
   }
 };
 

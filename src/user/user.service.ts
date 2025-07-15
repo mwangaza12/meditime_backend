@@ -3,6 +3,8 @@ import { UserInsert, UserRole, users, UserSelect } from "../drizzle/schema";
 import db from "../drizzle/db";
 
 export type UserListItem = {
+    password: string | null;
+    email: string | null;
     firstName: string | null;
     lastName: string | null;
     contactPhone: string | null;
@@ -37,9 +39,9 @@ export const getAllUsersService = async (page: number, pageSize: number) => {
 export const getUserByIdService = async (userId: number): Promise<UserListItem | undefined> => {
     const user = await db.query.users.findFirst({
         where: eq(users.userId, userId),
-        columns: {
-            password: false
-        },
+        // columns: {
+        //     password: false
+        // },
         with: {
             appointments: true,
             complaints: true,
@@ -79,3 +81,16 @@ export const updateProfileImageService = async (id: number,imageUrl: string): Pr
 
   return updatedUser;
 };
+
+export const updateUserPasswordService = async (email: string, newPassword: string): Promise<string> => {
+    const result = await db.update(users)
+        .set({ password: newPassword })
+        .where(eq(users.email, email))
+        .returning();
+
+    if (result.length === 0) {
+        throw new Error("User not found or password update failed");
+    }
+    
+    return "Password updated successfully";
+}
