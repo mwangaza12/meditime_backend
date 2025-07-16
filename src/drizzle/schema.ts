@@ -39,6 +39,8 @@ export const doctors = pgTable("doctors", {
     doctorId: serial("doctorId").primaryKey(),
     userId: integer("userId").notNull().unique().references(() => users.userId, { onDelete: "cascade" }),
     specializationId: integer("specializationId").references(() => specializations.specializationId, { onDelete: "set null" }),
+    bio: text("bio").notNull(),
+    experienceYears: integer("experienceYears"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
@@ -75,10 +77,17 @@ export const prescriptions = pgTable("prescriptions", {
     appointmentId: integer("appointmentId").notNull().references(() => appointments.appointmentId, { onDelete: "cascade" }),
     doctorId: integer("doctorId").notNull().references(() => doctors.doctorId, { onDelete: "cascade" }),
     patientId: integer("patientId").notNull().references(() => users.userId, { onDelete: "cascade" }),
-    notes: text("notes"),
-    createdAt: timestamp("createdAt").defaultNow(),
-    updatedAt: timestamp("updatedAt").defaultNow(),
+    medicationName: text("medicationName").notNull(),
+    dosage: text("dosage").notNull(),                     // e.g., "500mg"
+    frequency: text("frequency").notNull(),               // e.g., "Twice a day"
+    duration: integer("duration").notNull(),              // e.g., 7 (days)
+    instructions: text("instructions"),                   // e.g., "Take before meals"
+    isActive: boolean("isActive").default(true),
+    refillCount: integer("refill_count").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
 
 // Payments
 export const payments = pgTable("payments", {

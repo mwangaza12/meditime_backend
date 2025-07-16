@@ -41,6 +41,8 @@ CREATE TABLE "doctors" (
 	"doctorId" serial PRIMARY KEY NOT NULL,
 	"userId" integer NOT NULL,
 	"specializationId" integer,
+	"bio" text NOT NULL,
+	"experienceYears" integer,
 	"createdAt" timestamp DEFAULT now(),
 	"updatedAt" timestamp DEFAULT now(),
 	CONSTRAINT "doctors_userId_unique" UNIQUE("userId")
@@ -61,9 +63,15 @@ CREATE TABLE "prescriptions" (
 	"appointmentId" integer NOT NULL,
 	"doctorId" integer NOT NULL,
 	"patientId" integer NOT NULL,
-	"notes" text,
-	"createdAt" timestamp DEFAULT now(),
-	"updatedAt" timestamp DEFAULT now()
+	"medicationName" text NOT NULL,
+	"dosage" text NOT NULL,
+	"frequency" text NOT NULL,
+	"duration" integer NOT NULL,
+	"instructions" text,
+	"isActive" boolean DEFAULT true,
+	"refill_count" integer DEFAULT 0,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "specializations" (
