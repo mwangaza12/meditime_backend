@@ -139,8 +139,7 @@ export const getAppointmentsByDoctorIdService = async (userId: number, page: num
     with: {
       user: {
         columns: {
-          firstName: true,
-          lastName: true,
+          password: false
         },
       },
       doctor: {
@@ -148,16 +147,18 @@ export const getAppointmentsByDoctorIdService = async (userId: number, page: num
         with: {
           user: {
             columns: {
-              firstName: true,
-              lastName: true,
+                password: false
             },
+            
           },
+          availability: true,
           specialization: true
         },
       },
       prescriptions: true,
       payments: true,
       complaints: true,
+      
     },
     orderBy: desc(appointments.appointmentId),
     offset: (page - 1) * pageSize,

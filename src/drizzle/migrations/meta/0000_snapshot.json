@@ -1,5 +1,5 @@
 {
-  "id": "2d71ca24-87a1-47ec-a10e-ecd6a1f8579b",
+  "id": "13d5f08b-7549-4484-b503-77b4e923d254",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -29,6 +29,12 @@
         "availabilityId": {
           "name": "availabilityId",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "appointmentDate": {
+          "name": "appointmentDate",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },

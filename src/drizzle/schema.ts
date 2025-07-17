@@ -64,6 +64,7 @@ export const appointments = pgTable("appointments", {
     userId: integer("userId").notNull().references(() => users.userId, { onDelete: "cascade" }),
     doctorId: integer("doctorId").notNull().references(() => doctors.doctorId, { onDelete: "cascade" }),
     availabilityId: integer("availabilityId").notNull().references(() => doctorAvailability.availabilityId, { onDelete: "cascade" }),
+    appointmentDate: date("appointmentDate").notNull(), // ✅ add this
     totalAmount: numeric("totalAmount", { precision: 10, scale: 2 }).notNull(),
     appointmentStatus: appointmentStatusEnum("appointmentStatus").notNull().default("pending"),
     createdAt: timestamp("createdAt").defaultNow(),
