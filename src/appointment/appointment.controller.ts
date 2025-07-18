@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService,updateAppointmentStatusService } from "./appointment.service";
+import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService,updateAppointmentStatusService, updateAppointmentDateService } from "./appointment.service";
 import { appointmentValidator } from "../validators/appointment.validator";
 
 export const getAppointments = async (req: Request, res: Response) => {
@@ -178,6 +178,37 @@ export const updateAppointmentStatus = async (req: Request, res: Response) => {
     }
 
      res.status(200).json({ message: "Appointment status updated", appointment: updated });
+     return
+  } catch (error) {
+    console.error("Failed to update appointment status:", error);
+     res.status(500).json({ error: "Failed to update appointment status" });
+     return
+  }
+};
+
+export const updateAppointmentDate = async (req: Request, res: Response) => {
+  const appointmentId = parseInt(req.params.appointmentId);
+  const { date } = req.body;
+
+  if (isNaN(appointmentId)) {
+     res.status(400).json({ error: "Invalid appointment ID" });
+     return
+  }
+
+  if (!date) {
+     res.status(400).json({ error: "Invalid date value" });
+     return
+  }
+
+  try {
+    const updated = await updateAppointmentDateService(appointmentId, date);
+
+    if (!updated) {
+       res.status(404).json({ error: "Appointment not found" });
+       return
+    }
+
+     res.status(200).json({ message: "Appointment Date updated", appointment: updated });
      return
   } catch (error) {
     console.error("Failed to update appointment status:", error);

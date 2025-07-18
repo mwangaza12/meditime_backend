@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {getAppointments,getAppointmentById,createAppointment,updateAppointment,deleteAppointment, getAppointmentsByUserId, getAppointmentsByDoctorId, updateAppointmentStatus} from "./appointment.controller";
+import {getAppointments,getAppointmentById,createAppointment,updateAppointment,deleteAppointment, getAppointmentsByUserId, getAppointmentsByDoctorId, updateAppointmentStatus, updateAppointmentDate} from "./appointment.controller";
 import { pagination } from "../middleware/pagination";
 import { adminAuth, doctorAuth } from "../middleware/bearAuth";
 
@@ -13,5 +13,7 @@ appointmentRouter.post("/appointments", createAppointment);
 appointmentRouter.put("/appointments/:id", updateAppointment);
 appointmentRouter.delete("/appointments/:id", deleteAppointment);
 appointmentRouter.patch("/appointments/:appointmentId/status", updateAppointmentStatus);
+appointmentRouter.patch("/appointments/:appointmentId/reschedule", updateAppointmentDate);
+
 
 export default appointmentRouter;

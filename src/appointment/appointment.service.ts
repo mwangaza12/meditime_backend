@@ -178,3 +178,13 @@ export const updateAppointmentStatusService = async (appointmentId: number,statu
     return updatedAppointment;
 };
 
+export const updateAppointmentDateService = async (appointmentId: number,date: string): Promise<AppointmentSelect | undefined> => {
+    const [updatedAppointment] = await db
+        .update(appointments)
+        .set({ appointmentDate: date })
+        .where(eq(appointments.appointmentId, appointmentId))
+        .returning();
+
+    return updatedAppointment;
+};
+
