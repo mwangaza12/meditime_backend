@@ -113,6 +113,13 @@ export const complaints = pgTable("complaints", {
     updatedAt: timestamp("updatedAt").defaultNow(),
 });
 
+export const complaintReplies = pgTable("complaintReplies", {
+    replyId: serial("replyId").primaryKey(),
+    complaintId: integer("complaintId").notNull().references(() => complaints.complaintId, { onDelete: "cascade" }),
+    message: text("message").notNull(),
+    createdAt: timestamp("createdAt").defaultNow(),
+});
+
 // User Relations
 export const userRelations = relations(users, ({ many }) => ({
     appointments: many(appointments),
