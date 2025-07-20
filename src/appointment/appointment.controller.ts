@@ -103,30 +103,35 @@ export const deleteAppointment = async (req: Request, res: Response) => {
 
 export const getAppointmentsByUserId = async (req: Request, res: Response) => {
     try {
-        const userId = Number(req.query.userId);  // Using query param: /appointments/user?userId=123
+        const userId = Number(req.query.userId);
+        const page = Number(req.query.page);
+        const pageSize = Number(req.query.PageSize);
 
         if (isNaN(userId)) {
-             res.status(400).json({ message: "Invalid or missing userId" });
-             return;
-        }
-        const page=1;
-        const pageSize = 10;
-
-        const appointments = await getAppointmentsByUserIdService(userId, page, pageSize);
-
-        if (!appointments) {
-             res.status(404).json({ message: "No appointments found for this user." });
-             return;
+            res.status(400).json({ message: "Invalid or missing userId" });
+            return
         }
 
-         res.status(200).json(appointments);
-         return;
+        const result = await getAppointmentsByUserIdService(userId, page, pageSize);
+
+        if (!result || result.data.length === 0) {
+            res.status(404).json({ message: "No appointments found for this user." });
+            return
+        }
+
+        res.status(200).json({
+            appointments: result.data,
+            total: result.total,
+        });
+        return
     } catch (error) {
         console.error("Failed to get appointments:", error);
-         res.status(500).json({ message: "Internal server error" });
-         return;
+        res.status(500).json({ message: "Internal server error" });
+        return
     }
 };
+
+
 
 export const getAppointmentsByDoctorId = async (req: Request, res: Response) => {
     try {

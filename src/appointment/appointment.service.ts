@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import db from "../drizzle/db";
 import { AppointmentInsert, appointments, AppointmentSelect, AppointmentStatus, doctors } from "../drizzle/schema";
 
@@ -84,40 +84,51 @@ export const deleteAppointmentService = async (appointmentId: number): Promise<s
     return "Appointment deleted successfully";
 }
 
-export const getAppointmentsByUserIdService = async (userId: number,page: number, pageSize: number):  Promise<AppointmentSelect[] | null> => {
+export const getAppointmentsByUserIdService = async (userId: number,page: number,pageSize: number): Promise<{ data: AppointmentSelect[]; total: number }> => {
     const appointmentsList = await db.query.appointments.findMany({
         where: eq(appointments.userId, userId),
         with: {
+        user: {
+            columns: {
+            firstName: true,
+            lastName: true,
+            },
+        },
+        doctor: {
+            with: {
             user: {
                 columns: {
-                    firstName: true,
-                    lastName: true,
-                }
+                firstName: true,
+                lastName: true,
+                },
             },
-            doctor: {
-                with: {
-                    user: {
-                        columns: {
-                            firstName: true,
-                            lastName: true,
-                            
-                        }
-                    },
-                    specialization: true
-                }
+            availability: true,
+            specialization: true,
             },
-            prescriptions: true,
-            payments: true,
-            complaints: true,
+        },
+        prescriptions: true,
+        payments: true,
+        complaints: true,
         },
         orderBy: desc(appointments.appointmentId),
         offset: (page - 1) * pageSize,
         limit: pageSize,
+    });
 
-    })
+    // Total count using raw SQL count
+    const totalCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(appointments)
+        .where(eq(appointments.userId, userId));
 
-    return appointmentsList;
-}
+    const totalCount = totalCountResult[0]?.count ?? 0;
+
+    return {
+        data: appointmentsList,
+        total: totalCount,
+    };
+};
+
 
 export const getAppointmentsByDoctorIdService = async (userId: number, page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
   // Find the doctor record linked to this userId
