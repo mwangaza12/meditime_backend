@@ -1,15 +1,22 @@
 import { Router } from "express";
-import { createComplaint, deleteComplaint, getAllComplaints, getComplaintById, updateComplaint,getComplaintByUserId } from "./complaint.controller";
+import {createComplaint,deleteComplaint,getAllComplaints,getComplaintById,updateComplaint,getComplaintByUserId,} from "./complaint.controller";
+import { getAllComplaintReplies, addComplaintReply } from "../complaintReplies/complaintReplies.controller";
+
+
 import { pagination } from "../middleware/pagination";
 import { adminAuth, userAuth } from "../middleware/bearAuth";
 
 const complaintRouter = Router();
 
-complaintRouter.get("/complaints",pagination, adminAuth, getAllComplaints);
-complaintRouter.get("/complaints/:id",adminAuth, getComplaintById);
-complaintRouter.post("/complaints",userAuth, createComplaint);
-complaintRouter.put("/complaints/:id",adminAuth, updateComplaint);
-complaintRouter.delete("/complaints/:id",adminAuth, deleteComplaint);
+// Complaint CRUD
+complaintRouter.get("/complaints", pagination, adminAuth, getAllComplaints);
+complaintRouter.get("/complaints/:id", adminAuth, getComplaintById);
+complaintRouter.post("/complaints", userAuth, createComplaint);
+complaintRouter.put("/complaints/:id", adminAuth, updateComplaint);
+complaintRouter.delete("/complaints/:id", adminAuth, deleteComplaint);
 complaintRouter.get("/complaints/user/:userId", userAuth, getComplaintByUserId);
+
+complaintRouter.get("/complaints/:complaintId/replies", getAllComplaintReplies);
+complaintRouter.post("/complaints/:complaintId/replies", addComplaintReply);
 
 export default complaintRouter;

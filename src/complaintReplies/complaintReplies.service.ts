@@ -50,3 +50,26 @@ export const deleteComplaintReplyService = async (id: number): Promise<string> =
     await db.delete(complaintReplies).where(eq(complaintReplies.replyId, id));
     return "Complaint Reply deleted successfully";
 };
+
+export const getComplaintRepliesService = async (complaintId: number) => {
+  const replies = await db
+    .select()
+    .from(complaintReplies)
+    .where(eq(complaintReplies.complaintId, complaintId))
+    .orderBy(complaintReplies.createdAt);
+
+  return replies;
+};
+
+// POST a new reply
+export const addComplaintReplyService = async (complaintId: number, message: string) => {
+  const [reply] = await db
+    .insert(complaintReplies)
+    .values({
+      complaintId,
+      message,
+    })
+    .returning(); // returns inserted row(s)
+
+  return reply;
+};

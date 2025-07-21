@@ -5,6 +5,8 @@ import {
   createComplaintReplyService,
   updateComplaintReplyService,
   deleteComplaintReplyService,
+  getComplaintRepliesService,
+  addComplaintReplyService,
 } from "./complaintReplies.service";
 
 // GET: /complaint-replies?page=1&pageSize=10
@@ -100,5 +102,41 @@ export const deleteComplaintReply = async (req: Request, res: Response) => {
     } catch (err) {
          res.status(500).json({ error: "Failed to delete reply" });
          return
+    }
+};
+
+
+export const getComplaintReplies = async (req: Request, res: Response) => {
+    const complaintId = Number(req.params.complaintId);
+    if (!complaintId) return res.status(400).json({ message: "Invalid complaintId" });
+
+    try {
+        const replies = await getComplaintRepliesService(complaintId);
+        res.status(200).json(replies); // ✅ Return array directly
+    } catch (err) {
+        console.error("Error fetching complaint replies:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+
+// POST /complaints/:complaintId/replies
+export const addComplaintReply = async (req: Request, res: Response) => {
+    const complaintId = Number(req.params.complaintId);
+    const { message } = req.body;
+
+    if (!complaintId || !message) {
+        res.status(400).json({ message: "Missing complaintId or message" });
+        return
+    }
+
+    try {
+        const newReply = await addComplaintReplyService(complaintId, message);
+        res.status(201).json(newReply);
+        return
+    } catch (error) {
+        res.status(500).json({ message: "Failed to create reply", error });
+        return
     }
 };
