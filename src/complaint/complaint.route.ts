@@ -4,7 +4,7 @@ import { getAllComplaintReplies, addComplaintReply } from "../complaintReplies/c
 
 
 import { pagination } from "../middleware/pagination";
-import { adminAuth, userAuth } from "../middleware/bearAuth";
+import { adminAuth, allRolesAuth, userAuth } from "../middleware/bearAuth";
 
 const complaintRouter = Router();
 
@@ -16,7 +16,7 @@ complaintRouter.put("/complaints/:id", adminAuth, updateComplaint);
 complaintRouter.delete("/complaints/:id", adminAuth, deleteComplaint);
 complaintRouter.get("/complaints/user/:userId", userAuth, getComplaintByUserId);
 
-complaintRouter.get("/complaints/:complaintId/replies", getAllComplaintReplies);
-complaintRouter.post("/complaints/:complaintId/replies", addComplaintReply);
+complaintRouter.get("/complaints/:complaintId/replies", allRolesAuth, getAllComplaintReplies);
+complaintRouter.post("/complaints/:complaintId/replies",allRolesAuth, addComplaintReply);
 
 export default complaintRouter;

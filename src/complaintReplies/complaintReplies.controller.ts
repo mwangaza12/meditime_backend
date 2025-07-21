@@ -121,21 +121,22 @@ export const getComplaintReplies = async (req: Request, res: Response) => {
 
 
 
-// POST /complaints/:complaintId/replies
 export const addComplaintReply = async (req: Request, res: Response) => {
     const complaintId = Number(req.params.complaintId);
     const { message } = req.body;
+    const senderId = req.user?.userId; // Get senderId from the authenticated user
 
-    if (!complaintId || !message) {
-        res.status(400).json({ message: "Missing complaintId or message" });
+    if (!complaintId || !message || !senderId) {
+        res.status(400).json({ message: "Missing complaintId, message, or senderId" });
         return
     }
 
     try {
-        const newReply = await addComplaintReplyService(complaintId, message);
+        const newReply = await addComplaintReplyService(complaintId, message, senderId);
         res.status(201).json(newReply);
         return
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: "Failed to create reply", error });
         return
     }

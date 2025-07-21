@@ -62,11 +62,12 @@ export const getComplaintRepliesService = async (complaintId: number) => {
 };
 
 // POST a new reply
-export const addComplaintReplyService = async (complaintId: number, message: string) => {
+export const addComplaintReplyService = async (complaintId: number, message: string, senderId: number) => {
   const [reply] = await db
     .insert(complaintReplies)
     .values({
       complaintId,
+      senderId,
       message,
     })
     .returning(); // returns inserted row(s)

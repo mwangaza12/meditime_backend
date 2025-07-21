@@ -1,5 +1,5 @@
 {
-  "id": "0df92b2b-d12b-4ae9-baa3-29317dc81712",
+  "id": "5db6c015-0b21-4f1e-8eaa-df4a2b60f818",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -131,6 +131,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "senderId": {
+          "name": "senderId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "message": {
           "name": "message",
           "type": "text",
@@ -156,6 +162,19 @@
           ],
           "columnsTo": [
             "complaintId"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "complaintReplies_senderId_users_userId_fk": {
+          "name": "complaintReplies_senderId_users_userId_fk",
+          "tableFrom": "complaintReplies",
+          "tableTo": "users",
+          "columnsFrom": [
+            "senderId"
+          ],
+          "columnsTo": [
+            "userId"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"

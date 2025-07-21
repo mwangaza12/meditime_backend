@@ -116,6 +116,7 @@ export const complaints = pgTable("complaints", {
 export const complaintReplies = pgTable("complaintReplies", {
     replyId: serial("replyId").primaryKey(),
     complaintId: integer("complaintId").notNull().references(() => complaints.complaintId, { onDelete: "cascade" }),
+    senderId: integer("senderId").notNull().references(() => users.userId, { onDelete: "cascade" }), // add this line
     message: text("message").notNull(),
     createdAt: timestamp("createdAt").defaultNow(),
 });
