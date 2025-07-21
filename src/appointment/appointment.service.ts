@@ -129,7 +129,6 @@ export const getAppointmentsByUserIdService = async (userId: number,page: number
     };
 };
 
-
 export const getAppointmentsByDoctorIdService = async (userId: number, page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
   // Find the doctor record linked to this userId
   const doctorRecord = await db.query.doctors.findFirst({

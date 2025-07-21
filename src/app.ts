@@ -13,6 +13,7 @@ import { setupSwagger } from './swagger';
 import specializationRouter from './specialization/specialization.route';
 import doctorAvailabilityRouter from './doctorAvailability/doctorAvailabilty.route';
 import { webhookHandler } from './payment/payment.webhook'; // ✅ Add this
+import complaintRepliesRouter from './complaintReplies/complaintReplies.route';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api', complaintRouter);
 app.use('/api', userRouter);
 app.use('/api', specializationRouter);
 app.use('/api', doctorAvailabilityRouter);
+app.use('/api', complaintRepliesRouter);
 
 // Default root
 app.get('/', (req, res: Response) => {

@@ -206,6 +206,15 @@ export const complaintRelations = relations(complaints, ({ one }) => ({
     }),
 }));
 
+// Complaint Reply Relations
+export const complaintReplyRelations = relations(complaintReplies, ({ one }) => ({
+    complaint: one(complaints, {
+        fields: [complaintReplies.complaintId],
+        references: [complaints.complaintId],
+    }),
+}));
+
+
 // User Types
 export type UserSelect = typeof users.$inferSelect;
 export type UserInsert = typeof users.$inferInsert;
@@ -237,3 +246,7 @@ export type PaymentInsert = typeof payments.$inferInsert;
 // Complaint Types
 export type ComplaintSelect = typeof complaints.$inferSelect;
 export type ComplaintInsert = typeof complaints.$inferInsert;
+
+// Complaint Replies Types
+export type ComplaintReplySelect = typeof complaintReplies.$inferSelect;
+export type ComplaintReplyInsert = typeof complaintReplies.$inferInsert

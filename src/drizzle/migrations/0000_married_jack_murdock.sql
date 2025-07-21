@@ -15,6 +15,13 @@ CREATE TABLE "appointments" (
 	"updatedAt" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "complaintReplies" (
+	"replyId" serial PRIMARY KEY NOT NULL,
+	"complaintId" integer NOT NULL,
+	"message" text NOT NULL,
+	"createdAt" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "complaints" (
 	"complaintId" serial PRIMARY KEY NOT NULL,
 	"userId" integer NOT NULL,
@@ -102,6 +109,7 @@ CREATE TABLE "users" (
 ALTER TABLE "appointments" ADD CONSTRAINT "appointments_userId_users_userId_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("userId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "appointments" ADD CONSTRAINT "appointments_doctorId_doctors_doctorId_fk" FOREIGN KEY ("doctorId") REFERENCES "public"."doctors"("doctorId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "appointments" ADD CONSTRAINT "appointments_availabilityId_doctorAvailability_availabilityId_fk" FOREIGN KEY ("availabilityId") REFERENCES "public"."doctorAvailability"("availabilityId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "complaintReplies" ADD CONSTRAINT "complaintReplies_complaintId_complaints_complaintId_fk" FOREIGN KEY ("complaintId") REFERENCES "public"."complaints"("complaintId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "complaints" ADD CONSTRAINT "complaints_userId_users_userId_fk" FOREIGN KEY ("userId") REFERENCES "public"."users"("userId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "complaints" ADD CONSTRAINT "complaints_relatedAppointmentId_appointments_appointmentId_fk" FOREIGN KEY ("relatedAppointmentId") REFERENCES "public"."appointments"("appointmentId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "doctorAvailability" ADD CONSTRAINT "doctorAvailability_doctorId_doctors_doctorId_fk" FOREIGN KEY ("doctorId") REFERENCES "public"."doctors"("doctorId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

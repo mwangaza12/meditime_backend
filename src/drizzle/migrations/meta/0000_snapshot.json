@@ -1,5 +1,5 @@
 {
-  "id": "13d5f08b-7549-4484-b503-77b4e923d254",
+  "id": "0df92b2b-d12b-4ae9-baa3-29317dc81712",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -104,6 +104,58 @@
           ],
           "columnsTo": [
             "availabilityId"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.complaintReplies": {
+      "name": "complaintReplies",
+      "schema": "",
+      "columns": {
+        "replyId": {
+          "name": "replyId",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "complaintId": {
+          "name": "complaintId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "complaintReplies_complaintId_complaints_complaintId_fk": {
+          "name": "complaintReplies_complaintId_complaints_complaintId_fk",
+          "tableFrom": "complaintReplies",
+          "tableTo": "complaints",
+          "columnsFrom": [
+            "complaintId"
+          ],
+          "columnsTo": [
+            "complaintId"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
