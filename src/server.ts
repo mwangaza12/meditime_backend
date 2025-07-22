@@ -17,8 +17,6 @@ setSocketIOInstance(io); // <- make io accessible in other files
 
 io.on("connection", (socket) => {
   const { complaintId } = socket.handshake.query;
-  console.log(`Socket connected: ${socket.id}, room: complaint-${complaintId}`);
-
   if (complaintId) {
     socket.join(`complaint-${complaintId}`);
   }
