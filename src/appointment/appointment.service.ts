@@ -100,6 +100,7 @@ export const getAppointmentsByUserIdService = async (userId: number,page: number
                 columns: {
                 firstName: true,
                 lastName: true,
+                profileImageUrl: true,
                 },
             },
             availability: true,
