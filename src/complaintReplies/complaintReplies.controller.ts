@@ -106,13 +106,16 @@ export const deleteComplaintReply = async (req: Request, res: Response) => {
 };
 
 
-export const getComplaintReplies = async (req: Request, res: Response) => {
+export const getComplaintReplies = async (req: Request, res: Response): Promise<void> => {
     const complaintId = Number(req.params.complaintId);
-    if (!complaintId) return res.status(400).json({ message: "Invalid complaintId" });
+    if (!complaintId) {
+        res.status(400).json({ message: "Invalid complaintId" });
+        return;
+    }
 
     try {
         const replies = await getComplaintRepliesService(complaintId);
-        res.status(200).json(replies); // ✅ Return array directly
+        res.status(200).json({ replies });
     } catch (err) {
         console.error("Error fetching complaint replies:", err);
         res.status(500).json({ message: "Internal Server Error" });

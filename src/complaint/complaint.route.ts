@@ -1,10 +1,10 @@
 import { Router } from "express";
 import {createComplaint,deleteComplaint,getAllComplaints,getComplaintById,updateComplaint,getComplaintByUserId,} from "./complaint.controller";
-import { getAllComplaintReplies, addComplaintReply } from "../complaintReplies/complaintReplies.controller";
+import { getComplaintReplies, addComplaintReply } from "../complaintReplies/complaintReplies.controller";
 
 
 import { pagination } from "../middleware/pagination";
-import { adminAuth, allRolesAuth, userAuth } from "../middleware/bearAuth";
+import { adminAuth, adminOrUserAuth, allRolesAuth, userAuth } from "../middleware/bearAuth";
 
 const complaintRouter = Router();
 
@@ -16,7 +16,7 @@ complaintRouter.put("/complaints/:id", adminAuth, updateComplaint);
 complaintRouter.delete("/complaints/:id", adminAuth, deleteComplaint);
 complaintRouter.get("/complaints/user/:userId", userAuth, getComplaintByUserId);
 
-complaintRouter.get("/complaints/:complaintId/replies", allRolesAuth, getAllComplaintReplies);
+complaintRouter.get("/complaints/:complaintId/replies", adminOrUserAuth, getComplaintReplies);
 complaintRouter.post("/complaints/:complaintId/replies",allRolesAuth, addComplaintReply);
 
 export default complaintRouter;
