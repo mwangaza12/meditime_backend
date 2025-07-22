@@ -36,7 +36,10 @@ export const createDoctorAvailability = async (req: Request, res: Response) => {
   }
 
   try {
-    const availability = await createDoctorAvailabilityService(parsed.data);
+    const availability = await createDoctorAvailabilityService({
+      ...parsed.data,
+      amount: parsed.data.amount.toFixed(2),
+    });    
     res.status(201).json(availability);
   } catch (error) {
     res.status(500).json({ error: "Failed to create doctor availability" });
@@ -72,7 +75,10 @@ export const updateDoctorAvailability = async (req: Request, res: Response) => {
   }
 
   try {
-    const updated = await updateDoctorAvailabilityService(availabilityId, parsed.data);
+    const updated = await updateDoctorAvailabilityService(availabilityId, {
+      ...parsed.data,
+      amount: parsed.data.amount.toFixed(2),
+    });
     if (!updated) {
       res.status(404).json({ error: "Availability not found" });
       return;
