@@ -8,6 +8,7 @@ import {
   getComplaintRepliesService,
   addComplaintReplyService,
 } from "./complaintReplies.service";
+import { getSocketIOInstance } from "./socket";
 
 // GET: /complaint-replies?page=1&pageSize=10
 export const getAllComplaintReplies = async (req: Request, res: Response) => {
@@ -122,25 +123,27 @@ export const getComplaintReplies = async (req: Request, res: Response): Promise<
     }
 };
 
-
-
 export const addComplaintReply = async (req: Request, res: Response) => {
     const complaintId = Number(req.params.complaintId);
     const { message } = req.body;
-    const senderId = req.user?.userId; // Get senderId from the authenticated user
+    const senderId = req.user?.userId;
 
     if (!complaintId || !message || !senderId) {
         res.status(400).json({ message: "Missing complaintId, message, or senderId" });
-        return
+        return;
     }
 
     try {
         const newReply = await addComplaintReplyService(complaintId, message, senderId);
+
+        // Emit new reply via WebSocket
+        const io = getSocketIOInstance();
+        console.log(io);
+        io.to(`complaint-${complaintId}`).emit("new-reply", newReply);
+
         res.status(201).json(newReply);
-        return
     } catch (error) {
-        console.error(error);
+        console.error("Error creating reply:", error);
         res.status(500).json({ message: "Failed to create reply", error });
-        return
     }
 };
