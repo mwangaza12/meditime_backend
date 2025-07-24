@@ -74,6 +74,8 @@ export const deletePayment = async (req: Request, res: Response) => {
 
 export const createCheckoutSession = async (req: Request, res: Response) => {
   const { amount, appointmentId } = req.body;
+  const url =  process.env.FRONTEND_URL
+
 
   if (!amount || isNaN(amount)) {
     res.status(400).json({ error: 'Invalid input' });
@@ -100,8 +102,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       metadata: {
         appointmentId: appointmentId ? String(appointmentId) : '',
       },
-      success_url: 'http://localhost:5173/user-dashboard',
-      cancel_url: 'http://localhost:5173/payment-cancelled',
+      success_url: `${url}user-dashboard`,
+      cancel_url: `${url}payment-cancelled`,
     });
 
     res.status(200).json({ url: session.url });
