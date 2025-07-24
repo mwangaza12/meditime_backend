@@ -11,8 +11,7 @@
     "migrate": "drizzle-kit migrate",
     "studio": "drizzle-kit studio",
     "push": " drizzle-kit generate && drizzle-kit migrate",
-    "seed": "tsx src/drizzle/seed.ts",
-    "test": "jest --config jest.config.ts"
+    "seed": "tsx src/drizzle/seed.ts"
   },
   "keywords": [],
   "author": "",
