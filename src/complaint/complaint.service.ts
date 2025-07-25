@@ -1,6 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import db from "../drizzle/db";
-import { ComplaintInsert, complaints, ComplaintSelect } from "../drizzle/schema";
+import { ComplaintInsert, complaints, ComplaintSelect, ComplaintStatus } from "../drizzle/schema";
 
 export const getAllComplaintsService = async (page:number, pageSize: number): Promise<ComplaintSelect[] | null> => {
     const complaintsList = await db.query.complaints.findMany({
@@ -62,3 +62,13 @@ export const getAllComplaintsByUserService = async (page: number, pageSize: numb
 
     return complaintsList;
 }
+
+export const updateComplaintStatusService = async (complaintId: number,status: ComplaintStatus): Promise<ComplaintSelect | undefined> => {
+    const [updatedComplaint] = await db
+        .update(complaints)
+        .set({ status: status }) // ✅ Typed correctly
+        .where(eq(complaints.complaintId, complaintId))
+        .returning();
+
+    return updatedComplaint;
+};

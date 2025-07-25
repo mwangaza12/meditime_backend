@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createComplaintService, deleteComplaintService, getAllComplaintsService, getComplaintByIdService, updateComplaintService,getAllComplaintsByUserService } from "./complaint.service";
+import { createComplaintService, deleteComplaintService, getAllComplaintsService, getComplaintByIdService, updateComplaintService,getAllComplaintsByUserService, updateComplaintStatusService } from "./complaint.service";
 import { complaintValidator } from "../validators/complaint.validator";
 
 export const getAllComplaints = async (req: Request, res: Response) => {
@@ -113,4 +113,36 @@ export const getComplaintByUserId = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch complaints for user" });
     }
+};
+
+
+export const updateComplaintStatus = async (req: Request, res: Response) => {
+  const complaintId = parseInt(req.params.complaintId);
+  const { status } = req.body;
+
+  if (isNaN(complaintId)) {
+     res.status(400).json({ error: "Invalid Complaint ID" });
+     return
+  }
+
+  if (!["open", "inProgress", "resolved", "closed"].includes(status)) {
+     res.status(400).json({ error: "Invalid status value" });
+     return
+  }
+
+  try {
+    const updated = await updateComplaintStatusService(complaintId, status);
+
+    if (!updated) {
+       res.status(404).json({ error: "Complaint not found" });
+       return
+    }
+
+     res.status(200).json({ message: "Complaint status updated", complaint: updated });
+     return
+  } catch (error) {
+    console.error("Failed to update Complaint status:", error);
+     res.status(500).json({ error: "Failed to update complaint status" });
+     return
+  }
 };

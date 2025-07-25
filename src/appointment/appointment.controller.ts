@@ -131,8 +131,6 @@ export const getAppointmentsByUserId = async (req: Request, res: Response) => {
     }
 };
 
-
-
 export const getAppointmentsByDoctorId = async (req: Request, res: Response) => {
     try {
         const doctorId = Number(req.query.doctorId);  // Using query param: /appointments/user?doctorId=123

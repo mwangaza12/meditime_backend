@@ -7,6 +7,7 @@ export type UserRole = typeof userRoleEnum.enumValues[number];
 export const appointmentStatusEnum = pgEnum("appointmentStatus", ["pending", "confirmed", "cancelled"]);
 export type AppointmentStatus = typeof appointmentStatusEnum.enumValues[number];
 export const complaintStatusEnum = pgEnum("complaintStatus", ["open", "inProgress", "resolved", "closed"]);
+export type ComplaintStatus = typeof complaintStatusEnum.enumValues[number];
 export const paymentStatusEnum = pgEnum("paymentStatus", ["pending", "completed", "failed"]);
 export const dayOfWeekEnum = pgEnum("dayOfWeek", ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]);
 
