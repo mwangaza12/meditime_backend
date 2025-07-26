@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService,updateAppointmentStatusService, updateAppointmentDateService, doctorsPatientsService } from "./appointment.service";
+import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService,updateAppointmentStatusService, updateAppointmentDateService, doctorsPatientsService,getAvailableSlotsForDoctorService } from "./appointment.service";
 import { appointmentValidator } from "../validators/appointment.validator";
 
 export const getAppointments = async (req: Request, res: Response) => {
@@ -245,3 +245,23 @@ export const doctorsPatients = async (req: Request, res: Response) => {
     }
 
 }
+
+export const getAvailableSlotsForDoctor = async (req: Request, res: Response) => {
+    const doctorId = Number(req.query.doctorId);
+    const date = req.query.date as string;
+
+    if (!doctorId || !date) {
+        res.status(400).json({ message: "doctorId and date are required" });
+        return
+    }
+
+    try {
+        const slots = await getAvailableSlotsForDoctorService(doctorId, date);
+        
+        console.log(slots);
+        res.status(200).json({ availableSlots: slots });
+    } catch (error) {
+        console.error("Error fetching available slots:", error);
+        res.status(500).json({ message: "Failed to fetch available slots" });
+    }
+};

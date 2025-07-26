@@ -1,6 +1,8 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql, and } from "drizzle-orm";
 import db from "../drizzle/db";
-import { AppointmentInsert, appointments, AppointmentSelect, AppointmentStatus, doctors, users } from "../drizzle/schema";
+import { AppointmentInsert, appointments, AppointmentSelect, AppointmentStatus, doctors, users,doctorAvailability, DayOfWeek } from "../drizzle/schema";
+import { format, addMinutes, isBefore } from "date-fns";
+
 
 export const getAllAppointmentsService = async (page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
     const appointmentsList = await db.query.appointments.findMany({
@@ -231,3 +233,58 @@ export const doctorsPatientsService = async (userId: number) => {
 
   return patients;
 };
+
+export const getAvailableSlotsForDoctorService = async (doctorId: number, dateStr: string) => {
+    const date = new Date(dateStr);
+
+    // Fix 1: Cast the day to enum type
+    const dayOfWeek = format(date, "EEEE").toLowerCase() as DayOfWeek;
+
+    // Get availability for that weekday
+    const availability = await db.query.doctorAvailability.findFirst({
+        where: and(
+            eq(doctorAvailability.doctorId, doctorId),
+            eq(doctorAvailability.dayOfWeek, dayOfWeek),
+        ),
+    });
+
+    if (!availability) return [];
+
+    const { startTime, endTime, slotDurationMinutes } = availability;
+
+    // Generate all potential time slots
+    const slots: string[] = [];
+    let current = new Date(`${dateStr}T${startTime}`);
+    const end = new Date(`${dateStr}T${endTime}`);
+
+    while (isBefore(current, end)) {
+        const slotEnd = addMinutes(current, slotDurationMinutes);
+        if (isBefore(slotEnd, end) || +slotEnd === +end) {
+            slots.push(format(current, "HH:mm"));
+        }
+        current = slotEnd;
+    }
+
+    // Fix 2: Select startTime/endTime explicitly
+    const bookedAppointments = await db
+        .select({
+            startTime: appointments.startTime,
+            endTime: appointments.endTime,
+        })
+        .from(appointments)
+        .where(
+            and(
+                eq(appointments.doctorId, doctorId),
+                eq(appointments.appointmentDate, dateStr),
+            )
+        );
+
+    const bookedTimes = bookedAppointments.map(a =>
+        format(new Date(`${dateStr}T${a.startTime}`), "HH:mm")
+    );
+
+    const availableSlots = slots.filter(slot => !bookedTimes.includes(slot));
+
+    return availableSlots;
+};
+

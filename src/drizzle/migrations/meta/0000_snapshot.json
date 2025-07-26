@@ -1,5 +1,5 @@
 {
-  "id": "5db6c015-0b21-4f1e-8eaa-df4a2b60f818",
+  "id": "c8760f9f-be65-4448-9f4a-05745f1637bd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -35,6 +35,18 @@
         "appointmentDate": {
           "name": "appointmentDate",
           "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startTime": {
+          "name": "startTime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endTime": {
+          "name": "endTime",
+          "type": "time",
           "primaryKey": false,
           "notNull": true
         },

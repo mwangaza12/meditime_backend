@@ -9,6 +9,8 @@ CREATE TABLE "appointments" (
 	"doctorId" integer NOT NULL,
 	"availabilityId" integer NOT NULL,
 	"appointmentDate" date NOT NULL,
+	"startTime" time NOT NULL,
+	"endTime" time NOT NULL,
 	"totalAmount" numeric(10, 2) NOT NULL,
 	"appointmentStatus" "appointmentStatus" DEFAULT 'pending' NOT NULL,
 	"createdAt" timestamp DEFAULT now(),

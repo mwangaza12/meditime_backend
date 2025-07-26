@@ -10,6 +10,7 @@ export const complaintStatusEnum = pgEnum("complaintStatus", ["open", "inProgres
 export type ComplaintStatus = typeof complaintStatusEnum.enumValues[number];
 export const paymentStatusEnum = pgEnum("paymentStatus", ["pending", "completed", "failed"]);
 export const dayOfWeekEnum = pgEnum("dayOfWeek", ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]);
+export type DayOfWeek = typeof dayOfWeekEnum.enumValues[number];
 
 // Specializations
 export const specializations = pgTable("specializations", {
@@ -66,6 +67,8 @@ export const appointments = pgTable("appointments", {
     doctorId: integer("doctorId").notNull().references(() => doctors.doctorId, { onDelete: "cascade" }),
     availabilityId: integer("availabilityId").notNull().references(() => doctorAvailability.availabilityId, { onDelete: "cascade" }),
     appointmentDate: date("appointmentDate").notNull(), // ✅ add this
+    startTime: time("startTime").notNull(), // ✅ NEW
+    endTime: time("endTime").notNull(),     // ✅ NEW
     totalAmount: numeric("totalAmount", { precision: 10, scale: 2 }).notNull(),
     appointmentStatus: appointmentStatusEnum("appointmentStatus").notNull().default("pending"),
     createdAt: timestamp("createdAt").defaultNow(),
