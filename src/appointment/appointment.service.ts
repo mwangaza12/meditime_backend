@@ -1,6 +1,6 @@
 import { desc, eq, sql } from "drizzle-orm";
 import db from "../drizzle/db";
-import { AppointmentInsert, appointments, AppointmentSelect, AppointmentStatus, doctors } from "../drizzle/schema";
+import { AppointmentInsert, appointments, AppointmentSelect, AppointmentStatus, doctors, users } from "../drizzle/schema";
 
 export const getAllAppointmentsService = async (page: number, pageSize: number): Promise<AppointmentSelect[] | null> => {
     const appointmentsList = await db.query.appointments.findMany({
@@ -200,3 +200,34 @@ export const updateAppointmentDateService = async (appointmentId: number,date: s
     return updatedAppointment;
 };
 
+export const doctorsPatientsService = async (userId: number) => {
+    const doctorRecord = await db.query.doctors.findFirst({
+        where: eq(doctors.userId, userId),
+        columns: { doctorId: true }
+    });
+
+    if (!doctorRecord) {
+        // No doctor linked to this userId
+        return null;
+    }
+
+    const doctorId = doctorRecord.doctorId;
+
+  // Now find appointments for this doctorId
+    const patients = await db.query.appointments.findMany({
+        where: eq(appointments.doctorId, doctorId),
+        with: {
+        user: {
+            columns: {
+            password: false
+            },
+        },
+        prescriptions: true,
+        payments: true,
+        complaints: true,
+        },
+        orderBy: desc(appointments.appointmentId),
+    });
+
+  return patients;
+};
