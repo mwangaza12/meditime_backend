@@ -20,7 +20,8 @@ export const getAllAppointmentsService = async (page: number, pageSize: number):
                             
                         }
                     },
-                    specialization: true
+                    specialization: true,
+                    availability: true
                 }
             },
             prescriptions: true,
