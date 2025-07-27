@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService,updateAppointmentStatusService, updateAppointmentDateService, doctorsPatientsService,getAvailableSlotsForDoctorService } from "./appointment.service";
+import { createAppointmentService, deleteAppointmentService, getAllAppointmentsService, getAppointmentByIdService, updateAppointmentService, getAppointmentsByUserIdService,getAppointmentsByDoctorIdService,updateAppointmentStatusService, updateAppointmentDateService, doctorsPatientsService,getAvailableSlotsForDoctorService, deleteManyAppointmentsService } from "./appointment.service";
 import { appointmentValidator } from "../validators/appointment.validator";
 
 export const getAppointments = async (req: Request, res: Response) => {
@@ -263,5 +263,23 @@ export const getAvailableSlotsForDoctor = async (req: Request, res: Response) =>
     } catch (error) {
         console.error("Error fetching available slots:", error);
         res.status(500).json({ message: "Failed to fetch available slots" });
+    }
+};
+
+export const bulkDeleteAppointmentsController = async (req: Request, res: Response) => {
+    try {
+        const { ids } = req.body;
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            res.status(400).json({ message: "No appointment IDs provided" });
+            return
+        }
+
+        const message = await deleteManyAppointmentsService(ids);
+            res.status(200).json({ message });
+            return
+    } catch (error: any) {
+            res.status(500).json({ message: error.message || "Server error" });
+            return
     }
 };

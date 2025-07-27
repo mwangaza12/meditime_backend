@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {getAppointments,getAppointmentById,createAppointment,updateAppointment,deleteAppointment, getAppointmentsByUserId, getAppointmentsByDoctorId, updateAppointmentStatus, updateAppointmentDate, doctorsPatients, getAvailableSlotsForDoctor} from "./appointment.controller";
+import {getAppointments,getAppointmentById,createAppointment,updateAppointment,deleteAppointment, getAppointmentsByUserId, getAppointmentsByDoctorId, updateAppointmentStatus, updateAppointmentDate, doctorsPatients, getAvailableSlotsForDoctor, bulkDeleteAppointmentsController} from "./appointment.controller";
 import { pagination } from "../middleware/pagination";
 import { adminAuth, doctorAuth } from "../middleware/bearAuth";
 
@@ -16,5 +16,6 @@ appointmentRouter.patch("/appointments/:appointmentId/status", updateAppointment
 appointmentRouter.patch("/appointments/:appointmentId/reschedule", updateAppointmentDate);
 appointmentRouter.get("/patients/doctor", doctorsPatients);
 appointmentRouter.get("/available-slots", getAvailableSlotsForDoctor);
+appointmentRouter.post("/appointments/bulk-delete", adminAuth, bulkDeleteAppointmentsController);
 
 export default appointmentRouter;

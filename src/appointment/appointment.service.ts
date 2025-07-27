@@ -1,4 +1,4 @@
-import { desc, eq, sql, and } from "drizzle-orm";
+import { desc, eq, sql, and, inArray } from "drizzle-orm";
 import db from "../drizzle/db";
 import { AppointmentInsert, appointments, AppointmentSelect, AppointmentStatus, doctors, users,doctorAvailability, DayOfWeek } from "../drizzle/schema";
 import { format, addMinutes, isBefore } from "date-fns";
@@ -288,3 +288,12 @@ export const getAvailableSlotsForDoctorService = async (doctorId: number, dateSt
     return availableSlots;
 };
 
+export const deleteManyAppointmentsService = async (appointmentIds: number[]): Promise<string> => {
+    if (appointmentIds.length === 0) {
+        throw new Error("No appointment IDs provided.");
+    }
+
+    await db.delete(appointments).where(inArray(appointments.appointmentId, appointmentIds));
+
+    return "Appointments deleted successfully";
+};
