@@ -74,8 +74,7 @@ export const deletePayment = async (req: Request, res: Response) => {
 
 export const createCheckoutSession = async (req: Request, res: Response) => {
   const { amount, appointmentId } = req.body;
-  const url =  process.env.FRONTEND_URL
-
+  const url =  process.env.FRONTEND_URL;
 
   if (!amount || isNaN(amount)) {
     res.status(400).json({ error: 'Invalid input' });
@@ -89,8 +88,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       line_items: [
         {
           price_data: {
-            currency: 'usd',
-            unit_amount: amount,
+            currency: 'KES',
+            unit_amount: amount * 100,
             product_data: {
               name: 'Appointment Payment',
               description: 'Doctor Consultation',
