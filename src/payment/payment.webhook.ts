@@ -4,9 +4,7 @@ import db from "../drizzle/db";
 import { payments } from "../drizzle/schema";
 
 // Stripe instance
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const webhookHandler = async (req: Request, res: Response) => {
 
