@@ -146,3 +146,78 @@ export const updateComplaintStatus = async (req: Request, res: Response) => {
      return
   }
 };
+
+export const chatGptComplaint = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      res.status(400).json({ error: "Message is required" });
+    }
+
+    const systemPrompt = `You are a medical system assistant. Do NOT provide medical advice.
+You can help with:
+- Appointments: Scheduling, Rescheduling, Cancellation, Reminders
+- Prescriptions: Refills, Medication Info, Dosage Instructions, Side Effects
+- Billing: Invoices, Payments, Insurance Claims, Payment Plans
+- Medical Records: Accessing, Updating, Transferring
+- Technical Support: Website Issues, App Issues, Login Problems, Feature Requests
+
+Keep responses helpful, concise, and professional.`;
+
+    // ✅ NEW: Use HuggingFace Router API (Inference Providers)
+    const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.HUGGINGFACE_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "meta-llama/Llama-3.1-8B-Instruct", // Popular, reliable model
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: message
+          }
+        ],
+        max_tokens: 200,
+        temperature: 0.7
+      })
+    });
+
+    // Check for HTTP errors
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`HuggingFace Router API Error: ${response.status} ${response.statusText} - ${errorText}`);
+      
+      // Fallback response for users
+      res.json({ 
+        reply: "I'm currently experiencing technical difficulties. Please contact our support team directly at support@meditime.com or call 0792918456 for immediate assistance.",
+        status: "api_error"
+      });
+    }
+
+    const data = await response.json();
+
+    // Extract the response
+    const reply = data.choices?.[0]?.message?.content?.trim() || 
+                 "I'm here to help with your medical system needs. Could you please provide more details about what you need assistance with?";
+
+    res.json({ 
+      reply,
+      model: "meta-llama/Llama-3.1-8B-Instruct",
+      status: "success"
+    });
+
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).json({ 
+      error: "Internal server error",
+      reply: "I apologize for the technical issue. Please contact our support team directly for assistance."
+    });
+  }
+};

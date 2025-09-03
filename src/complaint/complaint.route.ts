@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {createComplaint,deleteComplaint,getAllComplaints,getComplaintById,updateComplaint,getComplaintByUserId, updateComplaintStatus,} from "./complaint.controller";
+import {createComplaint,deleteComplaint,getAllComplaints,getComplaintById,updateComplaint,getComplaintByUserId, updateComplaintStatus, chatGptComplaint,} from "./complaint.controller";
 import { getComplaintReplies, addComplaintReply } from "../complaintReplies/complaintReplies.controller";
 
 
@@ -19,5 +19,7 @@ complaintRouter.get("/complaints/user/:userId", userAuth, getComplaintByUserId);
 complaintRouter.get("/complaints/:complaintId/replies", adminOrUserAuth, getComplaintReplies);
 complaintRouter.post("/complaints/:complaintId/replies",allRolesAuth, addComplaintReply);
 complaintRouter.patch("/complaints/:complaintId/status", updateComplaintStatus);
+
+complaintRouter.post("/complaints/chatgpt", chatGptComplaint);
 
 export default complaintRouter;
