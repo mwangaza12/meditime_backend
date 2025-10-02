@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import {pgTable,serial,varchar,text,numeric,integer,date,time,timestamp,pgEnum,boolean,} from "drizzle-orm/pg-core";
+import {pgTable,serial,varchar,text,numeric,integer,date,time,timestamp,pgEnum,boolean,unique} from "drizzle-orm/pg-core";
 
 // Enums
 export const userRoleEnum = pgEnum("role", ["user", "admin", "doctor"]);
@@ -66,15 +66,16 @@ export const appointments = pgTable("appointments", {
     userId: integer("userId").notNull().references(() => users.userId, { onDelete: "cascade" }),
     doctorId: integer("doctorId").notNull().references(() => doctors.doctorId, { onDelete: "cascade" }),
     availabilityId: integer("availabilityId").notNull().references(() => doctorAvailability.availabilityId, { onDelete: "cascade" }),
-    appointmentDate: date("appointmentDate").notNull(), // ✅ add this
-    startTime: time("startTime").notNull(), // ✅ NEW
-    endTime: time("endTime").notNull(),     // ✅ NEW
+    appointmentDate: date("appointmentDate").notNull(),
+    startTime: time("startTime").notNull(),
+    endTime: time("endTime").notNull(),
     totalAmount: numeric("totalAmount", { precision: 10, scale: 2 }).notNull(),
     appointmentStatus: appointmentStatusEnum("appointmentStatus").notNull().default("pending"),
     createdAt: timestamp("createdAt").defaultNow(),
     updatedAt: timestamp("updatedAt").defaultNow(),
-});
-
+}, (t) => ({
+    doctorSlotUnique: unique().on(t.doctorId, t.appointmentDate, t.startTime),
+}));
 
 // Prescriptions
 export const prescriptions = pgTable("prescriptions", {
